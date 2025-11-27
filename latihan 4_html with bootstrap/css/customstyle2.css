@@ -1,0 +1,286 @@
+/* Variabel CSS untuk menyesuaikan skema warna */
+:root {
+    /* Warna Utama dan Latar Belakang */
+    --primary: #4f77ff; 
+    --section-b: #3e70a5; /* Lavender Pucat (About) */
+
+    /* Variabel Warna Teks Kustom */
+    --text-dark: #333333;     /* Teks utama (Hitam/Gelap) */
+    --text-secondary: #6c757d; /* Teks sekunder (Abu-abu) */
+    --text-light: #ffffff;    /* Teks terang (Putih) */
+}
+
+body {
+    /* Menggunakan variabel utama untuk warna teks body secara default */
+    color: var(--text-dark);
+    /* Menggunakan font Inter yang disukai, jika tersedia di sistem */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+/* Header / Sticky Nav */
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 120; 
+}
+
+.navbar-nav .nav-link {
+    /* Padding horizontal bawaan Bootstrap: px-3 */
+    /* Menambahkan padding vertikal (atas/bawah) yang lebih besar: 1rem (16px) */
+    padding-top: 1rem !important; 
+    padding-bottom: 1rem !important; 
+}
+
+/* -------------------------------------------------------------------------------------- */
+/* --- GAYA KUSTOM MINIMAL UNTUK MENDUKUNG LAYOUT (TIDAK ADA DI BOOTSTRAP 4 UTILITY) --- */
+/* -------------------------------------------------------------------------------------- */
+
+
+/* --- 1. HERO SECTION (Custom Height dan Overlay) --- */
+
+.hero {
+    position: relative;
+    /* Ubah dari min-height: 80vh menjadi height: 80vh agar lebih pasti */
+    height: 80vh; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden; 
+}
+
+/* Ketinggian penuh untuk Carousel (Penting) */
+.carousel, .carousel-inner, .carousel-item {
+    width: 100%;
+    height: 100%;
+}
+
+.hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(51, 51, 51, 0.4); 
+    z-index: 1;
+}
+
+.hero-caption-content {
+    /* Gaya ini diubah di media query untuk mobile */
+    position: absolute; 
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 800px;
+    z-index: 2;
+    padding: 0 15px;
+}
+
+
+/* --- 2. GAYA UNTUK VIDEO LOKAL (Custom Overlay dan Tombol Play) --- */
+
+.video-local-container {
+    position: relative;
+    background-color: #000;
+    cursor: pointer;
+    height: 100%; 
+    overflow: hidden;
+}
+
+#mainVideo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+    transition: opacity 0.5s;
+    z-index: 10;
+}
+
+.video-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.video-overlay.autoplay-active {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.play-button-local {
+    font-size: 4rem; 
+    color: rgba(255, 255, 255, 0.9);
+    transition: all 0.2s ease-in-out;
+    text-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+}
+
+
+/* --- 3. BACKGROUND GIF DAN PARALLAX UNTUK SECTION --- */
+
+/* Memperbaiki masalah z-index dengan memastikan background tidak mengganggu konten */
+#services, #contact {
+    position: relative;
+    overflow: hidden; /* Penting untuk mengontrol konten */
+}
+
+#services {
+    background-image: url('../img/ai_cctv.gif'); /* Ganti dengan URL GIF Anda */
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed; /* Efek Parallax */
+}
+
+.services-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.75); 
+    z-index: 0;
+}
+
+#contact {
+    background-image: url('../img/R.gif'); /* Ganti dengan URL GIF Anda */
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed; /* Efek Parallax */
+    color: #ffffff;
+}
+
+.contact-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); 
+    z-index: 0;
+}
+
+/* Memastikan konten di atas overlay */
+#services > .container-md, 
+#contact > .container-md {
+    position: relative;
+    z-index: 1; 
+}
+
+
+/* --- 4. GAYA INTERAKSI KUSTOM (Hover Effect) --- */
+
+.card-hover-shadow {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important; 
+}
+
+/* --- 5. GAYA KUSTOM UNTUK TIMELINE (Perjalanan AMANIN) --- */
+
+.timeline-container {
+    /* Mengizinkan scrolling horizontal */
+    overflow-x: auto; 
+    display: flex; 
+    padding: 1.5rem 0;
+}
+
+.timeline-item {
+    flex-shrink: 0;
+    width: 250px; /* Lebar default untuk ruang teks yang cukup */
+    position: relative;
+    padding-bottom: 25px; 
+    text-align: center;
+    margin: 0 15px; 
+}
+
+/* Garis tengah horizontal (Penghubung) */
+.timeline-spacer {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    padding: 0 10px; 
+}
+
+.timeline-spacer > hr {
+    height: 2px;
+    background-color: var(--text-secondary); 
+    margin: 0;
+    width: 100%;
+}
+
+/* Titik Timeline (Dot) */
+.timeline-dot {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--primary); 
+}
+
+
+/* Media Query untuk Mobile/Layar Kecil */
+@media (max-width: 767.98px) {
+    .hero {
+        /* Tinggi yang lebih pendek di perangkat mobile */
+        height: 60vh; 
+    }
+
+    /* PENYESUAIAN TEKS HERO DI MOBILE */
+    .hero-caption-content {
+        /* Memastikan teks berada di bagian bawah */
+        top: auto; 
+        bottom: 10%; /* Sedikit di atas bawah */
+        transform: translate(-50%, 0); 
+        width: 100%;
+        padding: 0 10px;
+        text-align: center;
+    }
+    
+    .hero-caption-content .display-4 {
+        /* Mengurangi ukuran H1 di mobile */
+        font-size: 1.75rem; 
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .hero-caption-content .lead {
+        /* Mengurangi ukuran lead text */
+        font-size: 1rem; 
+    }
+
+    /* Penyesuaian Timeline di mobile */
+    .timeline-item {
+        width: 180px; 
+    }
+}
+
+/* Penyesuaian responsif untuk item timeline agar menggunakan lebih banyak ruang di layar yang lebih besar */
+@media (min-width: 992px) {
+    .timeline-item {
+        width: 180px; 
+    }
+}
