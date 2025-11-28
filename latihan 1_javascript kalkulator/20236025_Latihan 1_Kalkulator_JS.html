@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Latihan 1 JS_Kalkulator</title>
+</head>
+
+<body>
+
+    <h1>Kalkulator Javascript</h1>
+    <p>Silahkan *refresh* halaman untuk mulai menghitung.</p>
+
+    <script>
+        let angka1 = prompt("Masukkan angka 1:");
+        let angka2 = prompt("Masukkan angka 2:");
+        let operator= prompt("Masukkan operator (+, -, *, /):");
+
+        const num1 = parseFloat(angka1);
+        const num2 = parseFloat(angka2);
+        let hasil;
+
+        if (isNaN(num1) || isNaN(num2)) {
+            alert("Input angka tidak valid. Perhitungan dibatalkan.");
+            throw new Error("Input angka tidak valid");
+        }
+
+        switch (operator) {
+            case '+':
+                hasil = num1 + num2;
+                break;
+            case '-':
+                hasil = num1 - num2;
+                break;
+            case '*':
+                hasil = num1 * num2;
+                break;
+            case '/':
+                if (num2 === 0){
+                    alert("Error: Pembagian dengan angka 0 tidak valid");
+                    throw new Error("Pembagian dengan nol.");
+                }
+                hasil = num1 / num2;
+                break;
+            default:
+                hasil = "Operator tidak valid.";
+        }
+
+        alert("Hasil: " + hasil);
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Latihan To Do List</title>
+</head>
+<body>
+
+    <h2>To-Do List with JS</h2>
+    
+    <input type="text" id="tugasBaru" placeholder="Tulis tugas...">
+    <button onclick="tambahTugas()">Tambah</button>
+    
+    <ul id="daftarTugas">
+        <li>Contoh tugas awal</li>
+    </ul>
+
+    <script>
+        function tambahTugas() {
+            const input = document.getElementById('tugasBaru');
+            const daftar = document.getElementById('daftarTugas');
+            const teksTugas = input.value.trim();
+
+            if (teksTugas === "") {
+                alert("Tugas tidak boleh kosong!");
+                return;
+            }
+
+            // 1. Buat <li> baru
+            const item = document.createElement('li');
+            item.textContent = teksTugas;
+
+            // 2. Tambahkan ke daftar
+            daftar.appendChild(item);
+
+            // 3. Bersihkan input
+            input.value = '';
+            input.focus();
+
+                    }
+    </script>
+
+    <i>Jangan lupa tugasnya ya!</i>
+
+</body>
+</html>
