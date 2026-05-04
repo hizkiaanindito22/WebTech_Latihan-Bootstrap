@@ -224,23 +224,51 @@ body {
 
 /* --- 5. GAYA KUSTOM UNTUK TIMELINE (Perjalanan AMANIN) --- */
 
+.timeline-navigation-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
 .timeline-container {
-    /* Mengizinkan scrolling horizontal */
-    overflow-x: auto; 
-    display: flex; 
-    padding: 1.5rem 0;
-    /* Tambahkan gaya untuk scrollbar agar lebih terlihat (opsional) */
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary) lightgray;
+    display: flex;
+    overflow-x: auto;
+    padding: 20px 0;
+    gap: 15px;
+    width: 100%;
+    /* PENTING: Matikan smooth scroll CSS agar tidak bentrok dengan JS */
+    scroll-behavior: auto !important; 
+    scrollbar-width: none; /* Sembunyikan scrollbar Firefox */
+}
+
+.timeline-container::-webkit-scrollbar {
+    display: none; /* Sembunyikan scrollbar Chrome/Safari */
 }
 
 .timeline-item {
-    flex-shrink: 0;
-    width: 100px; /* Diperluas dari 250px menjadi 320px */
-    position: relative;
-    padding-bottom: 25px; 
+    /* Set lebar fix sekitar 240px agar 4-5 item muat berdampingan di layar */
+    flex: 0 0 240px; 
     text-align: center;
-    margin: 0 30px; /* Margin horizontal ditambah untuk pemisahan lebih jelas */
+}
+
+.scroll-sensor {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100px; /* Area sensor lebih lebar */
+    z-index: 10;
+    cursor: pointer;
+}
+
+/* Gradien putih agar terlihat ada efek transisi di ujung layar */
+.left-sensor { 
+    left: 0; 
+    background: linear-gradient(to right, rgba(248,249,250, 1) 0%, transparent 100%);
+}
+.right-sensor { 
+    right: 0; 
+    background: linear-gradient(to left, rgba(248,249,250, 1) 0%, transparent 100%);
 }
 
 /* Garis tengah horizontal (Penghubung) */
@@ -276,7 +304,7 @@ body {
 
 /* Wrapper baru untuk membatasi lebar container metrik di desktop */
 .metrics-chart-wrapper {
-    max-width: 450px; /* Batasi lebar maksimum agar tidak terlalu lebar */
+    max-width: 900px; /* Batasi lebar maksimum agar tidak terlalu lebar */
     width: 100%; /* Pastikan responsif */
     margin: auto; /* Pusatkan di dalam kolom */
 }
@@ -288,9 +316,12 @@ body {
 }
 
 .chart-wrapper {
-    /* Wadah untuk setiap canvas chart */
-    height: 200px; /* Sedikit kurangi tinggi default untuk setiap grafik */
-    margin-bottom: 1rem !important; /* Kurangi margin antar chart */
+    position: relative;
+    padding: 10px; /* Tambahkan padding ekstra pada wrapper */
+}
+
+canvas {
+    max-width: 100% !important;
 }
 
 /* Mengurangi padding untuk h4 di dalam chart-wrapper */
@@ -311,31 +342,27 @@ body {
 
 .story-wrapper {
     position: relative;
+    /* Memberikan tinggi minimal yang pasti agar saat ganti slide, halaman tidak naik/turun */
+    min-height: 550px; 
     width: 100%;
-    height: 100%;
 }
 
+/* Memastikan slide tidak merusak layout saat transisi */
 .scroll-slide {
-    position: absolute;
+    width: 100%;
+    position: absolute; /* Bertumpuk di satu tempat */
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
     opacity: 0;
     visibility: hidden;
-    /* Durasi transisi, harus sama dengan yang di JS */
-    transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
-    /* Memastikan konten di tengah slide di tengah */
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    transition: all 0.6s ease;
 }
 
 .scroll-slide.active {
-    position: relative; /* Aktifkan mode flow normal untuk slide aktif */
+    position: relative; /* Slide yang aktif mengembalikan wujudnya */
     opacity: 1;
     visibility: visible;
-    transform: translateX(0); /* Posisi akhir setelah animasi masuk */
+    z-index: 2;
 }
 
 /* --- KEYFRAMES DAN ANIMASI MASUK/KELUAR --- */

@@ -1,3 +1,22 @@
+<?php 
+include 'koneksi.php';
+
+// Cek apakah ada data yang dikirim melalui POST (Dari Form Kontak)
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_kontak'])) {
+    $nama  = mysqli_real_escape_string($koneksi, $_POST['namaLengkap']);
+    $email = mysqli_real_escape_string($koneksi, $_POST['alamatEmail']);
+    $pesan = mysqli_real_escape_string($koneksi, $_POST['detailPesan']);
+
+    $query = "INSERT INTO pesan_kontak (nama, email, pesan) VALUES ('$nama', '$email', '$pesan')";
+
+    if (mysqli_query($koneksi, $query)) {
+        echo "<script>alert('Pesan berhasil terkirim ke database AMANIN!');</script>";
+    } else {
+        echo "<script>alert('Gagal mengirim pesan: " . mysqli_error($koneksi) . "');</script>";
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -7,21 +26,124 @@
     <link rel="icon" type="image/png" href="img/processed_image2.png">
     
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    
-    <link rel="stylesheet" href="css/customstyle2.css"> 
-    
+    <link rel="stylesheet" href="css/customstyle.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <script src="js/chart.umd.min.js"></script>
     
     <style>
-    section {
-            scroll-margin-top: 50px; /* Sesuaikan dengan tinggi header Anda + sedikit margin */
+        section {
+            scroll-margin-top: 50px; 
+        }
+        
+        /* =======================================
+           FIX TINGGI HALAMAN TENTANG KAMI
+           ======================================= */
+        .story-wrapper {
+            position: relative;
+            min-height: 550px; 
+            width: 100%;
+        }
+
+        .scroll-slide {
+            width: 100%;
+            position: absolute; 
+            top: 0;
+            left: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.6s ease;
+        }
+
+        .scroll-slide.active {
+            position: relative; 
+            opacity: 1;
+            visibility: visible;
+            z-index: 2;
+        }
+
+        /* =======================================
+           CSS TIMELINE AMANIN (4/5 ITEM & HOVER)
+           ======================================= */
+        .timeline-navigation-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .timeline-container {
+            display: flex;
+            align-items: flex-start;
+            overflow-x: auto;
+            padding: 20px 0;
+            width: 100%;
+            scroll-behavior: auto !important; 
+            scrollbar-width: none; 
+        }
+
+        .timeline-container::-webkit-scrollbar {
+            display: none; 
+        }
+
+        .timeline-item {
+            flex: 0 0 22%; 
+            min-width: 220px; 
+            text-align: center;
+            padding: 0 10px;
+            position: relative;
+        }
+
+        .scroll-sensor {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 10%; 
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        .left-sensor { 
+            left: 0; 
+            background: linear-gradient(to right, rgba(248,249,250, 0.9) 0%, transparent 100%);
+        }
+        .right-sensor { 
+            right: 0; 
+            background: linear-gradient(to left, rgba(248,249,250, 0.9) 0%, transparent 100%);
+        }
+
+        /* Garis dan Titik Timeline */
+        .timeline-spacer {
+            position: relative;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .timeline-spacer hr {
+            border-top: 2px solid #dee2e6;
+            margin: 0;
+        }
+        .timeline-dot {
+            height: 12px;
+            width: 12px;
+            background-color: #4f77ff;
+            border-radius: 50%;
+            display: inline-block;
+            position: absolute;
+            bottom: -5px; /* Menyesuaikan posisi titik di bawah teks */
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Chart Styles */
+        .chart-wrapper {
+            position: relative;
+            padding: 10px;
         }
     </style>
 </head>
 
-<body data-spy="scroll" data-target="#mainNav" data-offset="56">
+<body>
     
     <header class="header bg-white shadow-sm sticky-top">
         <nav class="navbar navbar-expand-lg navbar-light p-0" id="mainNav">
@@ -58,9 +180,7 @@
     </header>
 
     <section id="home" class="hero">
-        
         <div id="heroCarousel" class="carousel slide h-100" data-ride="carousel" data-interval="5000"> 
-            
             <ol class="carousel-indicators">
                 <li data-target="#heroCarousel" data-slide-to="0" class="active"></li>
                 <li data-target="#heroCarousel" data-slide-to="1"></li>
@@ -69,18 +189,12 @@
             </ol>
 
             <div class="carousel-inner h-100">
-
                 <div class="carousel-item active h-100">
                     <img src="img/perumahan.png" class="d-block w-100 hero-image" alt="Petugas keamanan sedang berpatroli">
                     <div class="hero-overlay"></div> 
-                    
                     <div class="carousel-caption hero-caption-content"> 
-                        <h1 class="display-4 font-weight-bold mb-3 text-white">
-                            MENCIPTAKAN LINGKUNGAN YANG AMAN.
-                        </h1>
-                        <p class="lead text-white">
-                            Solusi Keamanan Terpadu untuk Ketenangan Pikiran Anda.
-                        </p>
+                        <h1 class="display-4 font-weight-bold mb-3 text-white">MENCIPTAKAN LINGKUNGAN YANG AMAN.</h1>
+                        <p class="lead text-white">Solusi Keamanan Terpadu untuk Ketenangan Pikiran Anda.</p>
                         <a href="#services" class="btn btn-primary mt-3 px-5 py-2 font-weight-bold shadow-lg smooth-scroll rounded">Jelajahi Solusi</a>
                     </div>
                 </div>
@@ -89,12 +203,8 @@
                     <img src="img/control room.png" class="d-block w-100 hero-image" alt="Sistem pengawasan digital">
                     <div class="hero-overlay"></div>
                     <div class="carousel-caption hero-caption-content">
-                        <h1 class="display-4 font-weight-bold mb-3 text-white">
-                            PEMANTAUAN DENGAN AI.
-                        </h1>
-                        <p class="lead text-white">
-                            Perlindungan Maksimal, Dibantu Kecerdasan Luar Biasa, Setiap Saat.
-                        </p>
+                        <h1 class="display-4 font-weight-bold mb-3 text-white">PEMANTAUAN DENGAN AI.</h1>
+                        <p class="lead text-white">Perlindungan Maksimal, Dibantu Kecerdasan Luar Biasa, Setiap Saat.</p>
                         <a href="#services" class="btn btn-primary mt-3 px-5 py-2 font-weight-bold shadow-lg smooth-scroll rounded">Lihat Detail</a>
                     </div>
                 </div>
@@ -103,12 +213,8 @@
                     <img src="img/mall2.png" class="d-block w-100 hero-image" alt="Tim pengawalan profesional">
                     <div class="hero-overlay"></div>
                     <div class="carousel-caption hero-caption-content">
-                        <h1 class="display-4 font-weight-bold mb-3 text-white">
-                            PELAYANAN 24/7.
-                        </h1>
-                        <p class="lead text-white">
-                            Bahkan saat anda Tertidur.
-                        </p>
+                        <h1 class="display-4 font-weight-bold mb-3 text-white">PELAYANAN 24/7.</h1>
+                        <p class="lead text-white">Bahkan saat anda Tertidur.</p>
                         <a href="#contact" class="btn btn-primary mt-3 px-5 py-2 font-weight-bold shadow-lg smooth-scroll rounded">Jadwalkan Konsultasi</a>
                     </div>
                 </div>
@@ -117,16 +223,11 @@
                     <img src="img/pengawalan.png" class="d-block w-100 hero-image" alt="Tim pengawalan profesional">
                     <div class="hero-overlay"></div>
                     <div class="carousel-caption hero-caption-content">
-                        <h1 class="display-4 font-weight-bold mb-3 text-white">
-                            PENGAWALAN DI LAPANGAN.
-                        </h1>
-                        <p class="lead text-white">
-                            Respon Cepat untuk menghargai Waktu.
-                        </p>
+                        <h1 class="display-4 font-weight-bold mb-3 text-white">PENGAWALAN DI LAPANGAN.</h1>
+                        <p class="lead text-white">Respon Cepat untuk menghargai Waktu.</p>
                         <a href="#about" class="btn btn-primary mt-3 px-5 py-2 font-weight-bold shadow-lg smooth-scroll rounded">Tentang Respons</a>
                     </div>
                 </div>
-
             </div>
 
             <a class="carousel-control-prev" href="#heroCarousel" role="button" data-slide="prev">
@@ -137,54 +238,51 @@
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
                 <span class="sr-only">Next</span>
             </a>
-            
-            </div>
+        </div>
     </section>
     
     <section id="services" class="py-5 py-lg-5">
         <div class="services-overlay"></div>
         <div class="container-md text-center"> 
-            <h2 class="h1 font-weight-bold mb-5 text-primary">Layanan Kami</h2>
-            
-            <div class="row text-left"> 
-                <div class="col-md-4 mb-4"> 
-                    <div class="card h-100 border-0 shadow card-hover-shadow rounded-lg"> 
-                        <div class="card-body text-center p-4 p-md-5">
-                            <i class="fas fa-eye fa-3x mb-3 text-primary"></i>
-                            <h5 class="card-title font-weight-bold text-dark">Pengawasan Keamanan</h5>
-                            <p class="card-text text-secondary mt-3">
-                                Pemantauan 24/7 dan tindakan pencegahan proaktif untuk perlindungan aset dan personel.
-                            </p>
-                            <a href="#" class="btn btn-sm btn-outline-primary mt-3 rounded-pill">Pelajari Lebih Lanjut</a>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-4 mb-4"> 
-                    <div class="card h-100 border-0 shadow card-hover-shadow rounded-lg"> 
-                        <div class="card-body text-center p-4 p-md-5">
-                            <i class="fas fa-shield-alt fa-3x mb-3 text-primary"></i>
-                            <h5 class="card-title font-weight-bold text-dark">Layanan Pengawalan</h5>
-                            <p class="card-text text-secondary mt-3">
-                                Pengawalan profesional untuk individu penting, aset berharga, atau transportasi logistik dengan kerahasiaan maksimal.
-                            </p>
-                            <a href="#" class="btn btn-sm btn-outline-primary mt-3 rounded-pill">Pelajari Lebih Lanjut</a>
-                        </div>
-                    </div>
-                </div>
+        <h2 class="h1 font-weight-bold mb-5 text-primary">Layanan Kami</h2>
+        
+        <div class="row text-left"> 
+            <?php
+            // Mengambil data dari tabel layanan
+            $query_layanan = "SELECT * FROM layanan";
+            $result_layanan = mysqli_query($koneksi, $query_layanan);
 
-                <div class="col-md-4 mb-4"> 
-                    <div class="card h-100 border-0 shadow card-hover-shadow rounded-lg"> 
-                        <div class="card-body text-center p-4 p-md-5">
-                            <i class="fas fa-satellite-dish fa-3x mb-3 text-primary"></i>
-                            <h5 class="card-title font-weight-bold text-dark">Pusat Komando (CC)</h5>
-                            <p class="card-text text-secondary mt-3">
-                                Pusat operasi terpadu untuk koordinasi, manajemen insiden, dan respons cepat darurat dalam hitungan detik.
-                            </p>
-                            <a href="#" class="btn btn-sm btn-outline-primary mt-3 rounded-pill">Pelajari Lebih Lanjut</a>
+            if ($result_layanan && mysqli_num_rows($result_layanan) > 0) {
+                while($row = mysqli_fetch_assoc($result_layanan)) {
+                    
+                    // Logika penentuan ikon
+                    $icon_class = "fas fa-shield-alt";
+                    if ($row['id'] == 1) { $icon_class = "fas fa-eye"; } 
+                    elseif ($row['id'] == 2) { $icon_class = "fas fa-shield-alt"; } 
+                    elseif ($row['id'] == 3) { $icon_class = "fas fa-satellite-dish"; }
+                    ?>
+                    
+                    <div class="col-md-4 mb-4"> 
+                        <div class="card h-100 border-0 shadow card-hover-shadow rounded-lg"> 
+                            <div class="card-body text-center p-4 p-md-5">
+                                <i class="<?php echo $icon_class; ?> fa-3x mb-3 text-primary"></i>
+                                <h5 class="card-title font-weight-bold text-dark">
+                                    <?php echo htmlspecialchars($row['nama_layanan']); ?>
+                                </h5>
+                                <p class="card-text text-secondary mt-3">
+                                    <?php echo htmlspecialchars($row['keterangan']); ?>
+                                </p>
+                                <a href="#" class="btn btn-sm btn-outline-primary mt-3 rounded-pill">Pelajari Lebih Lanjut</a>
+                            </div>
                         </div>
                     </div>
-                </div>
+                    
+                    <?php
+                }
+            } else {
+                echo "<p class='text-center w-100'>Data layanan tidak ditemukan atau koneksi gagal.</p>";
+            }
+            ?>
             </div>
         </div>
     </section>
@@ -200,18 +298,15 @@
             <div class="row mb-5 justify-content-center">
                 <div class="col-lg-8">
                     <div class="embed-responsive embed-responsive-16by9 rounded-lg shadow-lg video-local-container" id="videoContainer">
-                        
                         <video id="mainVideo" preload="metadata" 
                                 poster="https://placehold.co/1280x720/AAAAAA/FFFFFF?text=Placeholder+Video+Amanin+Studio" 
                                 muted loop playsinline>
                             <source src="vid/ComPro.mp4" type="video/mp4">
                             Browser Anda tidak mendukung tag video.
                         </video>
-                        
                         <div class="video-overlay" id="videoOverlay">
                              <i class="far fa-play-circle play-button-local"></i>
                         </div>
-                        
                     </div>
                 </div>
             </div>
@@ -224,98 +319,60 @@
                             <div class="col-12">
                                 <h3 class="h2 font-weight-bold mb-5 text-center text-dark">Perjalanan AMANIN</h3>
                                 
-                                <div class="timeline-container" style="min-width: 500px; overflow-x: auto;">
-                                    
-                                    <div class="timeline-item">
-                                        <div class="mb-3">
-                                            <i class="fas fa-calendar-alt fa-3x text-primary"></i>
+                                <div class="timeline-navigation-wrapper">
+                                    <!-- Area Sensor Hover -->
+                                    <div class="scroll-sensor left-sensor" id="leftSensor"></div>
+                                    <div class="scroll-sensor right-sensor" id="rightSensor"></div>
+
+                                    <div class="timeline-container" id="timelineAmanin">
+                                        
+                                        <div class="timeline-item">
+                                            <div class="mb-3"><i class="fas fa-calendar-alt fa-3x text-primary"></i></div>
+                                            <h4 class="h5 font-weight-bold mb-1 text-dark">2010</h4>
+                                            <p class="text-secondary small font-weight-bold mb-1">Pendirian Awal</p>
+                                            <p class="text-secondary small">AMANIN didirikan dengan visi menciptakan lingkungan yang aman.</p>
+                                            <span class="timeline-dot"></span>
                                         </div>
-                                        <h4 class="h5 font-weight-bold mb-1 text-dark">2010</h4>
-                                        <p class="text-secondary small font-weight-bold mb-1">Pendirian Awal</p>
-                                        <p class="text-secondary small">
-                                            AMANIN didirikan dengan visi menciptakan lingkungan yang aman.
-                                        </p>
-                                        <span class="timeline-dot"></span>
-                                    </div>
 
-                                    <div class="timeline-spacer">
-                                        <hr>
-                                    </div>
-
-                                    <div class="timeline-item">
-                                        <div class="mb-3">
-                                            <i class="fas fa-users fa-3x text-primary"></i>
+                                        <div class="timeline-item">
+                                            <div class="mb-3"><i class="fas fa-users fa-3x text-primary"></i></div>
+                                            <h4 class="h5 font-weight-bold mb-1 text-dark">2013</h4>
+                                            <p class="text-secondary small font-weight-bold mb-1">Ekspansi Kapasitas</p>
+                                            <p class="text-secondary small">Mendirikan kantor pusat pertama dan merekrut 1500 anggota pengamanan.</p>
+                                            <span class="timeline-dot"></span>
                                         </div>
-                                        <h4 class="h5 font-weight-bold mb-1 text-dark">2013</h4>
-                                        <p class="text-secondary small font-weight-bold mb-1">Ekspansi Kapasitas</p>
-                                        <p class="text-secondary small">
-                                            Mendirikan kantor pusat pertama dan merekrut 1500 anggota pengamanan.
-                                        </p>
-                                        <span class="timeline-dot"></span>
-                                    </div>
-                                    
-                                    <div class="timeline-spacer">
-                                        <hr>
-                                    </div>
 
-                                    <div class="timeline-item">
-                                        <div class="mb-3">
-                                            <i class="fas fa-medal fa-3x text-primary"></i>
+                                        <div class="timeline-item">
+                                            <div class="mb-3"><i class="fas fa-medal fa-3x text-primary"></i></div>
+                                            <h4 class="h5 font-weight-bold mb-1 text-dark">2014</h4>
+                                            <p class="text-secondary small font-weight-bold mb-1">Pengakuan Nasional</p>
+                                            <p class="text-secondary small">Diakui dan disertifikasi oleh Kementerian Keamanan Negara.</p>
+                                            <span class="timeline-dot"></span>
                                         </div>
-                                        <h4 class="h5 font-weight-bold mb-1 text-dark">2014</h4>
-                                        <p class="text-secondary small font-weight-bold mb-1">Pengakuan Nasional</p>
-                                        <p class="text-secondary small">
-                                            Diakui dan disertifikasi oleh Kementerian Keamanan Negara.
-                                        </p>
-                                        <span class="timeline-dot"></span>
-                                    </div>
-
-                                    <div class="timeline-spacer">
-                                        <hr>
-                                    </div>
-                                    
-                                    <div class="timeline-item">
-                                        <div class="mb-3">
-                                            <i class="fas fa-chart-line fa-3x text-primary"></i>
+                                        
+                                        <div class="timeline-item">
+                                            <div class="mb-3"><i class="fas fa-chart-line fa-3x text-primary"></i></div>
+                                            <h4 class="h5 font-weight-bold mb-1 text-dark">2016</h4>
+                                            <p class="text-secondary small font-weight-bold mb-1">Pertumbuhan Anggota</p>
+                                            <p class="text-secondary small">Total anggota pengamanan mencapai 5000 personil terlatih.</p>
+                                            <span class="timeline-dot"></span>
                                         </div>
-                                        <h4 class="h5 font-weight-bold mb-1 text-dark">2016</h4>
-                                        <p class="text-secondary small font-weight-bold mb-1">Pertumbuhan Anggota</p>
-                                        <p class="text-secondary small">
-                                            Total anggota pengamanan mencapai 5000 personil terlatih.
-                                        </p>
-                                        <span class="timeline-dot"></span>
-                                    </div>
-                                    
-                                    <div class="timeline-spacer">
-                                        <hr>
-                                    </div>
 
-                                     <div class="timeline-item">
-                                        <div class="mb-3">
-                                            <i class="fas fa-building fa-3x text-primary"></i>
+                                         <div class="timeline-item">
+                                            <div class="mb-3"><i class="fas fa-building fa-3x text-primary"></i></div>
+                                            <h4 class="h5 font-weight-bold mb-1 text-dark">2020</h4>
+                                            <p class="text-secondary small font-weight-bold mb-1">Pembangunan Markas Baru</p>
+                                            <p class="text-secondary small">Mendirikan Menara Keamanan Barat - Jl. Sakti, Indonesia.</p>
+                                            <span class="timeline-dot"></span>
                                         </div>
-                                        <h4 class="h5 font-weight-bold mb-1 text-dark">2020</h4>
-                                        <p class="text-secondary small font-weight-bold mb-1">Pembangunan Markas Baru</p>
-                                        <p class="text-secondary small">
-                                            Mendirikan Menara Keamanan Barat - Jl. Sakti, Indonesia.
-                                        </p>
-                                        <span class="timeline-dot"></span>
-                                    </div>
 
-                                    <div class="timeline-spacer">
-                                        <hr>
-                                    </div>
-
-                                    <div class="timeline-item">
-                                        <div class="mb-3">
-                                            <i class="fas fa-handshake fa-3x text-primary"></i>
+                                        <div class="timeline-item">
+                                            <div class="mb-3"><i class="fas fa-handshake fa-3x text-primary"></i></div>
+                                            <h4 class="h5 font-weight-bold mb-1 text-dark">2024</h4>
+                                            <p class="text-secondary small font-weight-bold mb-1">Jaringan Klien</p>
+                                            <p class="text-secondary small">Dipercaya oleh total 250 klien nasional, termasuk 40 pusat perbelanjaan (mall).</p>
+                                            <span class="timeline-dot"></span>
                                         </div>
-                                        <h4 class="h5 font-weight-bold mb-1 text-dark">2024</h4>
-                                        <p class="text-secondary small font-weight-bold mb-1">Jaringan Klien</p>
-                                        <p class="text-secondary small">
-                                            Dipercaya oleh total 250 klien nasional, termasuk 40 pusat perbelanjaan (mall).
-                                        </p>
-                                        <span class="timeline-dot"></span>
                                     </div>
                                 </div>
                             </div>
@@ -337,18 +394,32 @@
                     <div class="scroll-slide animate-in-right" data-slide="3">
                         <div class="row text-left align-items-center h-100 py-5"> 
                             <div class="col-lg-12 pt-md-4 d-flex justify-content-center align-items-center"> 
-                                <div class="metrics-chart-wrapper"> 
+                                <div class="metrics-chart-wrapper" style="width: 100%; max-width: 900px; margin: 0 auto;"> 
                                     <h3 class="h3 font-weight-bold mb-4 text-dark text-center">Metrik Kinerja Utama</h3>
                                     
                                     <div class="chart-container-group bg-white p-4 p-md-5 rounded-lg shadow-lg border border-gray-100">
-                                        <div class="chart-wrapper mb-5">
-                                            <h4 class="h5 font-weight-bold mb-3 text-dark text-center">Waktu Respons Rata-Rata (Target 5 Menit)</h4>
-                                            <canvas id="responseChart"></canvas>
-                                        </div>
+                                        <div class="row align-items-center"> 
+                                            
+                                            <!-- Kolom Kiri: Waktu Respons -->
+                                            <div class="col-md-6 mb-4 mb-md-0">
+                                                <div class="chart-wrapper">
+                                                    <h4 class="h5 font-weight-bold mb-3 text-dark text-center">Waktu Respons</h4>
+                                                    <div style="height: 250px;"> 
+                                                        <canvas id="responseChart"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         
-                                        <div class="chart-wrapper">
-                                            <h4 class="h5 font-weight-bold mb-3 text-dark text-center">Tingkat Kepuasan Klien</h4>
-                                            <canvas id="satisfactionChart"></canvas>
+                                            <!-- Kolom Kanan: Tingkat Kepuasan -->
+                                            <div class="col-md-6 border-left-md">
+                                                <div class="chart-wrapper">
+                                                    <h4 class="h5 font-weight-bold mb-3 text-dark text-center">Tingkat Kepuasan Klien</h4>
+                                                    <div style="height: 250px;"> 
+                                                        <canvas id="satisfactionChart"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -358,6 +429,7 @@
 
                 </div> 
             </div>
+            
             <div class="d-flex justify-content-center mt-4">
                 <button class="btn btn-lg btn-outline-primary mx-3 slide-nav-btn" id="prevSlide" disabled>
                     <i class="fas fa-chevron-left"></i>
@@ -375,25 +447,24 @@
         <div class="contact-overlay"></div>
         <div class="container-md text-center" style="max-width: 800px;"> 
             <h2 class="h1 font-weight-bold mb-3 text-white">Kontak Kami</h2>
-            
             <p class="lead font-weight-bold mb-3 text-white">Dapatkan Perlindungan Terbaik!</p>
 
-            <form action="#" method="POST" class="bg-white p-4 p-md-5 rounded-lg shadow-lg border border-gray-100"> 
+            <form action="" method="POST" class="bg-white p-4 p-md-5 rounded-lg shadow-lg border border-gray-100"> 
                 <div class="form-row"> 
                     <div class="form-group col-md-6"> 
-                        <input type="text" class="form-control rounded" placeholder="Nama Lengkap" required>
+                        <input type="text" name="namaLengkap" class="form-control rounded" placeholder="Nama Lengkap" required>
                     </div>
                     <div class="form-group col-md-6"> 
-                        <input type="email" class="form-control rounded" placeholder="Alamat Email" required>
+                        <input type="email" name="alamatEmail" class="form-control rounded" placeholder="Alamat Email" required>
                     </div>
                 </div>
                 
                 <div class="form-group"> 
-                    <textarea class="form-control rounded" placeholder="Detail Proyek atau Pertanyaan Anda" rows="4" required></textarea>
+                    <textarea name="detailPesan" class="form-control rounded" placeholder="Detail Proyek atau Pertanyaan Anda" rows="4" required></textarea>
                 </div>
 
                 <div class="pt-2 text-left"> 
-                    <button type="submit" class="btn btn-primary font-weight-semibold px-4 py-2 shadow rounded">
+                    <button type="submit" name="submit_kontak" class="btn btn-primary font-weight-semibold px-4 py-2 shadow rounded">
                         Kirim Pesan
                     </button>
                 </div>
@@ -403,12 +474,8 @@
 
     <footer class="bg-light py-4 border-top">
         <div class="container-md"> 
-            <p class="text-muted small text-center mb-0">
-                &copy; 2025 PT Selalu Dibuat Aman.
-            </p>
-            <p class="text-muted small text-center mb-0">
-                Menara Keamanan Barat - Jl. Sakti, Indonesia
-            </p>
+            <p class="text-muted small text-center mb-0">&copy; 2026 PT Selalu Dibuat Aman.</p>
+            <p class="text-muted small text-center mb-0">Menara Keamanan Barat - Jl. Sakti, Indonesia</p>
         </div>
     </footer>
 
@@ -417,34 +484,43 @@
     <script src="js/bootstrap.min.js"></script>
 
     <script>
-        
-        // Logika Smooth Scrolling
+        // ===================================
+        // 1. MENU NAVIGASI AKTIF & SMOOTH SCROLL
+        // ===================================
+        const sections = document.querySelectorAll("section");
+        const navLinks = document.querySelectorAll(".navbar-nav .nav-link");
+
         document.querySelectorAll('.smooth-scroll').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
-                // Khusus link #contact
-                if (this.getAttribute('href') === '#contact') {
-                    // Hanya izinkan scroll jika semua slide sudah dilihat (logika scroll blocker akan menangani)
-                    if (window.hasViewedAllSlides) {
-                        document.querySelector(this.getAttribute('href')).scrollIntoView({
-                            behavior: 'smooth'
-                        });
-                    } else {
-                        // Jika belum, cegah default (memblokir scroll)
-                        e.preventDefault();
-                        // Opsional: Beri umpan balik ke user (misalnya, scroll ke slide 1)
-                        document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
-                    }
-                } else {
-                    // Link lainnya (home, services, about) tetap smooth scroll
-                    e.preventDefault();
-                    document.querySelector(this.getAttribute('href')).scrollIntoView({
-                        behavior: 'smooth'
-                    });
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        window.addEventListener("scroll", () => {
+            let current = "";
+            sections.forEach((section) => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute("id");
+                }
+            });
+
+            if ((window.innerHeight + Math.round(window.scrollY)) >= document.body.offsetHeight - 10) {
+                current = "contact";
+            }
+
+            navLinks.forEach((a) => {
+                a.classList.remove("active");
+                if (a.getAttribute("href") === "#" + current) {
+                    a.classList.add("active");
                 }
             });
         });
-        
-        // Logika Video Lokal (Tetap)
+                
+        // ===================================
+        // 2. LOGIKA VIDEO PROFIL
+        // ===================================
         const mainVideo = document.getElementById('mainVideo');
         const videoOverlay = document.getElementById('videoOverlay');
         const videoContainer = document.getElementById('videoContainer');
@@ -466,25 +542,15 @@
             }
         }
         
-        if (videoContainer) {
-            videoContainer.addEventListener('click', toggleVideo);
-        }
+        if (videoContainer) videoContainer.addEventListener('click', toggleVideo);
 
-        const options = {
-            root: null, 
-            rootMargin: '0px',
-            threshold: 0.5 
-        };
-
-        const observer = new IntersectionObserver((entries, observer) => {
+        const options = { root: null, rootMargin: '0px', threshold: 0.5 };
+        const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 const video = entry.target;
-
                 if (entry.isIntersecting) {
                     if (!userInteracted) {
-                        video.play().catch(error => {
-                            // console.warn("Autoplay ditolak oleh browser:", error);
-                        });
+                        video.play().catch(error => {});
                         videoOverlay.classList.add('autoplay-active'); 
                         video.controls = false; 
                     }
@@ -500,9 +566,6 @@
 
         if (mainVideo) {
             observer.observe(mainVideo);
-        }
-
-        if (mainVideo) {
             mainVideo.addEventListener('ended', () => {
                 videoOverlay.classList.remove('autoplay-active'); 
                 videoOverlay.classList.remove('hidden'); 
@@ -515,31 +578,16 @@
         }
 
         // ===================================
-        // LOGIKA CHART.JS (Tetap)
+        // 3. LOGIKA SLIDESHOW & TRIGGER ANIMASI
         // ===================================
-        const primaryColor = '#4f77ff'; 
-        const secondaryColor = '#6c757d'; 
-
-        // ===================================
-        // LOGIKA STORY SLIDESHOW BARU + SCROLL OVERRIDE
-        // ===================================
-
         const slides = document.querySelectorAll('.scroll-slide');
         const prevButton = document.getElementById('prevSlide');
         const nextButton = document.getElementById('nextSlide');
-        const aboutSection = document.getElementById('about');
         
         let currentSlide = 1;
         const totalSlides = slides.length;
         let isTransitioning = false;
-        // Pindahkan status ini ke window agar dapat diakses oleh scroll listener global
-        window.hasViewedAllSlides = false; 
-        
-        // Penundaan agar scroll wheel tidak memicu terlalu cepat
-        let lastScrollTime = 0;
-        const scrollThrottle = 1000; // 1000ms delay antar slide
 
-        // Fungsi untuk memperbarui tampilan slide
         function updateSlides(direction) {
             if (isTransitioning) return;
             isTransitioning = true;
@@ -554,212 +602,188 @@
 
             if (nextSlide) {
                 const enterClass = direction === 'next' ? 'animate-in-right' : 'animate-in-left';
-                
                 setTimeout(() => {
                     nextSlide.classList.remove('animate-out');
                     nextSlide.classList.add('active', enterClass);
                     
+                    // --- TRIGGER ANIMASI KETIKA SLIDE 3 (METRIK) TERBUKA ---
+                    if (currentSlide === 3) {
+                        playChartAnimations();
+                    }
+
                     setTimeout(() => {
-                            isTransitioning = false;
-                            updateButtons();
-
-                            // --- LOGIKA SCROLL OTOMATIS TIMELINE KE TAHUN TERBARU (2024) ---
-                            if (currentSlide === 1) {
-                                const timelineContainer = nextSlide.querySelector('.timeline-container');
-                                if (timelineContainer) {
-                                    // Scroll the timeline to the very end (right) to show the latest year (2024)
-                                    // Menggunakan setTimeout 50ms untuk memastikan DOM sudah dirender/lebar terhitung
-                                    setTimeout(() => {
-                                        timelineContainer.scrollLeft = timelineContainer.scrollWidth;
-                                    }, 50);
-                                }
-                            }
-                            // -----------------------------------------------------------------
-
-                            // UPDATE STATUS GLOBAL
-                            window.hasViewedAllSlides = (currentSlide === totalSlides); 
-                        
-                        // Setelah slide terakhir, hapus scroll listener agar user bisa scroll ke bawah
-                        if (window.hasViewedAllSlides) {
-                            removeScrollOverride();
-                            // console.log("Semua slide dilihat. Scroll mouse dikembalikan.");
-                        } else {
-                             // Pastikan scroll override selalu aktif selama belum sampai slide terakhir
-                             addScrollOverride(); 
-                        }
+                        isTransitioning = false;
+                        updateButtons();
                     }, 800); 
                 }, 50);
             }
         }
 
-        // Fungsi untuk mengontrol tombol navigasi
         function updateButtons() {
             if (prevButton) prevButton.disabled = currentSlide === 1;
             if (nextButton) nextButton.disabled = currentSlide === totalSlides;
         }
 
-        // Event Listener untuk tombol
         if (prevButton) {
             prevButton.addEventListener('click', () => {
-                if (currentSlide > 1) {
-                    currentSlide--;
-                    updateSlides('prev');
-                }
+                if (currentSlide > 1) { currentSlide--; updateSlides('prev'); }
             });
         }
-
         if (nextButton) {
             nextButton.addEventListener('click', () => {
-                if (currentSlide < totalSlides) {
-                    currentSlide++;
-                    updateSlides('next');
-                }
+                if (currentSlide < totalSlides) { currentSlide++; updateSlides('next'); }
             });
         }
 
+        // ===================================
+        // 4. MENGEMBALIKAN WHEEL SCROLL CAROUSEL
+        // ===================================
+        const storyScrollContainer = document.querySelector('.story-scroll-container');
+        let lastWheelTime = 0;
+        
+        if (storyScrollContainer) {
+            storyScrollContainer.addEventListener('wheel', function(e) {
+                if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return; 
 
-        // --- Logika Scroll Wheel Override ---
-
-        function handleWheelScroll(e) {
-            const now = Date.now();
-            
-            // Dapatkan posisi scroll #about relatif terhadap viewport
-            const rect = aboutSection.getBoundingClientRect();
-            // Tentukan area aktif (di dalam 70% viewport, di tengah layar)
-            const isActiveArea = rect.top < window.innerHeight * 0.7 && rect.bottom > window.innerHeight * 0.3;
-
-            if (isActiveArea) {
-                // Selama di area #about dan belum melihat semua slide, cegah scroll halaman
-                e.preventDefault(); 
-
-                // Cek apakah sedang dalam batas throttle
-                if (now - lastScrollTime < scrollThrottle) {
-                    return;
-                }
-                
                 let direction = e.deltaY > 0 ? 'next' : 'prev';
+                const now = Date.now();
 
-                if (direction === 'next' && currentSlide < totalSlides) {
-                    currentSlide++;
-                    updateSlides('next');
-                    lastScrollTime = now;
-                } else if (direction === 'prev' && currentSlide > 1) {
-                    currentSlide--;
-                    updateSlides('prev');
-                    lastScrollTime = now;
+                if ((direction === 'next' && currentSlide < totalSlides) || 
+                    (direction === 'prev' && currentSlide > 1)) {
+                    
+                    e.preventDefault(); 
+                    if (now - lastWheelTime >= 1000) { 
+                        if (direction === 'next') { currentSlide++; updateSlides('next'); } 
+                        else { currentSlide--; updateSlides('prev'); }
+                        lastWheelTime = now;
+                    }
                 }
-            } 
-            
-            // Logika Pelepasan Scroll:
-            // Jika sudah di slide terakhir (currentSlide === totalSlides)
-            // DAN user scroll ke bawah (e.deltaY > 0)
-            // DAN bagian bawah #about sudah mendekati batas bawah viewport
-            if (window.hasViewedAllSlides && e.deltaY > 0 && rect.bottom <= window.innerHeight * 1.1) {
-                 removeScrollOverride();
-                 // Biarkan scroll berjalan untuk pindah ke #contact
-                 return; 
-            }
-            
-            // Logika untuk memastikan smooth scroll ke #about jika pengguna mencoba scroll up terlalu cepat
-            if (e.deltaY < 0 && rect.top > 0) {
-                 // Jika user scroll ke atas dan #about ada di atas, biarkan scroll
-                 return;
-            }
+            }, { passive: false });
         }
-        
-        // Tambahkan listener
-        function addScrollOverride() {
-             // Cek apakah listener sudah ada untuk mencegah duplikasi
-            if (!window.scrollOverrideActive) {
-                window.addEventListener('wheel', handleWheelScroll, { passive: false });
-                window.scrollOverrideActive = true;
-            }
+
+        // ===================================
+        // 5. LOGIKA HOVER SCROLL TIMELINE & DEFAULT 2024
+        // ===================================
+        const timeline = document.getElementById('timelineAmanin');
+        const leftSensor = document.getElementById('leftSensor');
+        const rightSensor = document.getElementById('rightSensor');
+
+        let scrollInterval;
+        const scrollSpeed = 6; 
+
+        function startScrolling(direction) {
+            stopScrolling();
+            if (!timeline) return;
+            scrollInterval = setInterval(() => {
+                if (direction === 'left') timeline.scrollLeft -= scrollSpeed;
+                else timeline.scrollLeft += scrollSpeed;
+            }, 15);
         }
-        
-        // Hapus listener
-        function removeScrollOverride() {
-            if (window.scrollOverrideActive) {
-                window.removeEventListener('wheel', handleWheelScroll);
-                window.scrollOverrideActive = false;
+
+        function stopScrolling() { clearInterval(scrollInterval); }
+
+        if(leftSensor && rightSensor) {
+            leftSensor.addEventListener('mouseenter', () => startScrolling('left'));
+            leftSensor.addEventListener('mouseleave', stopScrolling);
+            rightSensor.addEventListener('mouseenter', () => startScrolling('right'));
+            rightSensor.addEventListener('mouseleave', stopScrolling);
+        }
+
+        function scrollToLatest() {
+            if (timeline) {
+                setTimeout(() => { timeline.scrollLeft = timeline.scrollWidth; }, 100);
             }
         }
 
+        const originalUpdateSlides = updateSlides;
+        updateSlides = function(direction) {
+            originalUpdateSlides(direction);
+            if (currentSlide === 1) scrollToLatest();
+        };
+
+        // ===================================
+        // 6. INISIALISASI CHART JS & ANIMASI
+        // ===================================
+        let responseChart;
+        let satisfactionChart;
+        const primaryColor = '#4f77ff'; 
+        const secondaryColor = '#6c757d'; 
+
+        // Fungsi Memutar Ulang Animasi
+        function playChartAnimations() {
+            if (responseChart && satisfactionChart) {
+                // 1. Simpan nilai aktual yang didapat dari database
+                const targetWaktu = responseChart.data.datasets[1].data[0] || 0;
+                const targetPuas = satisfactionChart.data.datasets[0].data[0] || 0;
+                const targetTidakPuas = satisfactionChart.data.datasets[0].data[1] || 100;
+
+                // 2. Setel nilai grafik menjadi 0 (Tanpa animasi)
+                responseChart.data.datasets[1].data = [0];
+                satisfactionChart.data.datasets[0].data = [0, 100];
+                responseChart.update('none');
+                satisfactionChart.update('none');
+
+                // 3. Beri jeda 100ms, lalu kembalikan ke nilai aktual (Akan memicu animasi)
+                setTimeout(() => {
+                    responseChart.data.datasets[1].data = [targetWaktu];
+                    satisfactionChart.data.datasets[0].data = [targetPuas, targetTidakPuas];
+                    responseChart.update(); 
+                    satisfactionChart.update();
+                }, 100);
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', function () {
             
-            // Inisialisasi: Tetapkan slide pertama dan aktifkan scroll override
             updateSlides('next'); 
-            addScrollOverride(); 
+            scrollToLatest();
             
-            // --- Logika Chart.js di sini ---
-
             const responseCtx = document.getElementById('responseChart');
             if (responseCtx) {
-                 new Chart(responseCtx, {
+                responseChart = new Chart(responseCtx, {
                     type: 'bar',
                     data: {
-                        labels: ['Waktu Respons (Menit)'],
+                        labels: ['Waktu Respons'],
                         datasets: [
                             {
-                                label: 'Pencapaian (4.5 Menit)',
-                                data: [4.5],
-                                backgroundColor: primaryColor,
-                                barPercentage: 0.8,
+                                label: 'Respon Petugas Umum (5 Menit)',
+                                data: [5], 
+                                backgroundColor: 'rgba(93, 111, 128, 0.2)', 
+                                barPercentage: 0.5, 
                                 categoryPercentage: 1.0
                             },
                             {
-                                label: 'Target Maksimal (5 Menit)',
-                                data: [5], 
-                                backgroundColor: 'rgba(255, 99, 132, 0.2)', 
-                                barPercentage: 0.8,
+                                label: 'Respon AMANIN (Loading...)',
+                                data: [0],
+                                backgroundColor: primaryColor, 
+                                barPercentage: 0.5, 
                                 categoryPercentage: 1.0
                             }
                         ]
                     },
                     options: {
+                        animation: {
+                            duration: 1500, // Durasi animasi 1.5 Detik
+                            easing: 'easeOutQuart' // Animasi melambat di akhir
+                        },
                         indexAxis: 'y', 
+                        grouped: false, 
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: {
-                                display: false 
-                            },
+                            legend: { display: false },
                             tooltip: {
                                 callbacks: {
                                     label: function(context) {
-                                        if (context.datasetIndex === 0) {
-                                            return ' ' + context.raw + ' Menit';
-                                        } else {
-                                            return ' Target: ' + context.raw + ' Menit';
-                                        }
+                                        if (context.datasetIndex === 1) return ' Waktu: ' + context.raw + ' Menit';
+                                        else return ' Target: ' + context.raw + ' Menit';
                                     }
                                 }
                             }
                         },
                         scales: {
-                            x: {
-                                max: 6, 
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Waktu (Menit)',
-                                    color: secondaryColor
-                                },
-                                ticks: {
-                                    color: secondaryColor
-                                },
-                                grid: {
-                                    display: false
-                                }
-                            },
-                            y: {
-                                ticks: {
-                                    display: false 
-                                },
-                                grid: {
-                                    display: false
-                                }
-                            }
+                            x: { max: 6, beginAtZero: true, title: { display: true, text: 'Waktu (Menit)', color: secondaryColor }, ticks: { color: secondaryColor }, grid: { display: false } },
+                            y: { ticks: { display: false }, grid: { display: false } }
                         }
                     }
                 });
@@ -767,37 +791,32 @@
 
             const satisfactionCtx = document.getElementById('satisfactionChart');
             if (satisfactionCtx) {
-                new Chart(satisfactionCtx, {
+                satisfactionChart = new Chart(satisfactionCtx, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Puas (98%)', 'Tidak Puas (2%)'],
+                        labels: ['Puas (Loading...)', 'Tidak Puas'],
                         datasets: [{
-                            data: [98, 2], 
-                            backgroundColor: [
-                                primaryColor,
-                                '#dc3545' 
-                            ],
+                            data: [0, 100], 
+                            backgroundColor: [ primaryColor, '#dc3545' ],
                             hoverOffset: 10
                         }]
                     },
                     options: {
+                        animation: {
+                            duration: 1500, // Durasi animasi lingkaran 1.5 Detik
+                            easing: 'easeOutQuart' 
+                        },
                         responsive: true,
                         maintainAspectRatio: false,
                         cutout: '75%', 
+                        layout: { padding: 20 },
                         plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    color: secondaryColor
-                                }
-                            },
+                            legend: { position: 'bottom', labels: { color: secondaryColor } },
                             tooltip: {
                                 callbacks: {
                                     label: function(context) {
                                         let label = context.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
+                                        if (label) label += ': ';
                                         label += context.raw + '%';
                                         return label;
                                     }
@@ -808,18 +827,16 @@
                     plugins: [{
                         id: 'textCenter',
                         beforeDraw: function(chart) {
-                            const width = chart.width,
-                                height = chart.height,
-                                ctx = chart.ctx;
-                            
+                            const width = chart.width, height = chart.height, ctx = chart.ctx;
                             ctx.restore();
-                            const fontSize = (height / 114).toFixed(2);
+                            const fontSize = (height / 150).toFixed(2);
                             ctx.font = '700 ' + fontSize + 'em sans-serif'; 
                             ctx.textBaseline = 'middle';
                             
-                            const text = '98%', 
-                                textX = Math.round((width - ctx.measureText(text).width) / 2),
-                                textY = height / 2;
+                            const val = chart.data.datasets[0].data[0];
+                            const text = val + '%', 
+                                  textX = Math.round((width - ctx.measureText(text).width) / 2), 
+                                  textY = height / 2;
                             
                             ctx.fillStyle = primaryColor; 
                             ctx.fillText(text, textX, textY);
@@ -828,10 +845,47 @@
                     }]
                 });
             }
+
+            // Fungsi AJAX Real-Time dengan Deteksi Perubahan Data
+            function updateMetricsRealtime() {
+                fetch('get_metrics.php?t=' + new Date().getTime())
+                    .then(response => {
+                        if(!response.ok) throw new Error('Jaringan Error');
+                        return response.json();
+                    })
+                    .then(data => {
+                        // 1. Logika Update Bar Chart (Waktu Respons)
+                        if (responseChart) {
+                            // Ambil angka yang sedang tampil di grafik saat ini
+                            let currentWaktu = responseChart.data.datasets[1].data[0];
+                            
+                            // Jika angka dari database BERBEDA dengan yang di grafik, maka animasikan!
+                            if (currentWaktu !== data.waktu_amanin) {
+                                responseChart.data.datasets[1].data = [data.waktu_amanin];
+                                responseChart.data.datasets[1].label = `Respon AMANIN (${data.waktu_amanin} Menit)`;
+                                responseChart.update(); // <-- Memanggil .update() tanpa 'none' memicu animasi transisi mulus
+                            }
+                        }
+
+                        // 2. Logika Update Doughnut Chart (Kepuasan)
+                        if (satisfactionChart) {
+                            // Ambil persentase Puas yang sedang tampil saat ini
+                            let currentPuas = satisfactionChart.data.datasets[0].data[0];
+                            
+                            // Jika persentase berubah, putar grafiknya!
+                            if (currentPuas !== data.puas) {
+                                satisfactionChart.data.datasets[0].data = [data.puas, data.tidak_puas];
+                                satisfactionChart.data.labels = [`Puas (${data.puas}%)`, `Tidak Puas (${data.tidak_puas}%)`];
+                                satisfactionChart.update(); // <-- Memicu animasi memutar
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Gagal memuat data metrik:', error));
+            }
+
+            updateMetricsRealtime(); // Panggil pertama kali
+            setInterval(updateMetricsRealtime, 3000); // Polling setiap 3 detik
         });
-
     </script>
-
-
 </body>
 </html>
