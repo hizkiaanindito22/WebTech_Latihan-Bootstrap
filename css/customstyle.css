@@ -1,21 +1,58 @@
-/* Variabel CSS untuk menyesuaikan skema warna */
+/* ==========================================================================
+   VARIABEL CSS UTAMA (Mendukung Dark Mode)
+   ========================================================================== */
 :root {
-    /* Warna Utama dan Latar Belakang */
+    /* Skema Light Mode (Default) */
     --primary: #4f77ff; 
-    --section-b: #f8f9fa; /* Diubah menjadi latar terang untuk section 'about' */
-
-    /* Variabel Warna Teks Kustom */
-    --text-dark: #333333;     /* Teks utama (Hitam/Gelap) */
-    --text-secondary: #6c757d; /* Teks sekunder (Abu-abu) */
-    --text-light: #ffffff;    /* Teks terang (Putih) */
+    --bg-body: #ffffff;
+    --bg-card: #ffffff;
+    --bg-light-section: #f8f9fa; /* Untuk seksi abu-abu terang */
+    --text-main: #333333;     
+    --text-muted: #6c757d; 
+    --border-color: #dee2e6;
 }
 
+/* Pastikan ini ada di bagian paling atas customstyle.css */
+html[data-theme="dark"] {
+    --bg-body: #121212;
+    --bg-card: #1e1e1e;
+    --bg-light-section: #1a1a1a; 
+    --text-main: #f8f9fa;
+    --text-muted: #adb5bd;
+    --border-color: #333333;
+}
+
+/* ==========================================================================
+   PENERAPAN VARIABEL KE ELEMEN DASAR
+   ========================================================================== */
 body {
-    /* Menggunakan variabel utama untuk warna teks body secara default */
-    color: var(--text-dark);
-    /* Menggunakan font Inter yang disukai, jika tersedia di sistem */
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    background-color: var(--bg-body) !important;
+    color: var(--text-main) !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* Memaksa elemen struktural Bootstrap menggunakan variabel Dark Mode */
+.card, 
+.navbar, 
+.chart-container-group, 
+.bg-white,
+form {
+    background-color: var(--bg-card) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border-color) !important;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Mengatur warna section bg-light */
+.bg-light { 
+    background-color: var(--bg-light-section) !important; 
+    transition: background-color 0.3s ease;
+}
+
+/* Memaksa utility text Bootstrap untuk ikut gelap/terang */
+.text-dark { color: var(--text-main) !important; }
+.text-secondary, .text-muted { color: var(--text-muted) !important; }
 
 /* Header / Sticky Nav */
 .header {
@@ -25,27 +62,23 @@ body {
 }
 
 .navbar-nav .nav-link {
-    /* Padding horizontal bawaan Bootstrap: px-3 */
-    /* Menambahkan padding vertikal (atas/bawah) yang lebih besar: 1rem (16px) */
-    padding: 1rem 1rem !important; /* Disesuaikan agar block lebih rapi */
-    position: relative; /* Untuk menempatkan garis bawah */
-    transition: color 0.3s ease, background-color 0.3s ease, transform 0.3s ease, font-size 0.3s ease; /* Tambahkan transisi untuk efek block dan zoom */
-    border-radius: 0.5rem; /* Tambahkan sedikit pembulatan untuk efek block */
-    display: inline-block; /* Agar transisi ukuran berfungsi lebih baik */
+    padding: 1rem 1rem !important; 
+    position: relative; 
+    transition: color 0.3s ease, background-color 0.3s ease, transform 0.3s ease, font-size 0.3s ease; 
+    border-radius: 0.5rem; 
+    display: inline-block; 
 }
 
 /* GAYA UNTUK ACTIVE LINK */
 .navbar-nav .nav-link.active {
-    color: var(--text-light) !important;       /* Teks menjadi putih */
-    background-color: var(--primary) !important; /* Latar belakang menjadi warna primary */
-    font-size: 1.1rem;                         /* Efek zoom/membesar */
-    font-weight: bold !important;              /* Menekankan teks yang aktif */
-    /* Hapus padding-bottom: 1rem yang berlebihan */
+    color: #ffffff !important; /* Sengaja tetap putih agar kontras dengan primary color */
+    background-color: var(--primary) !important; 
+    font-size: 1.1rem;                         
+    font-weight: bold !important;              
     padding-top: 1.1rem !important;
     padding-bottom: 1.1rem !important;
 }
 
-/* HAPUS garis bawah aktif yang lama */
 .navbar-nav .nav-link.active::after {
     content: none;
 }
@@ -54,12 +87,10 @@ body {
 /* --- GAYA KUSTOM MINIMAL UNTUK MENDUKUNG LAYOUT (TIDAK ADA DI BOOTSTRAP 4 UTILITY) --- */
 /* -------------------------------------------------------------------------------------- */
 
-
 /* --- 1. HERO SECTION (Custom Height dan Overlay) --- */
 
 .hero {
     position: relative;
-    /* DIBUAT LEBIH PANJANG: Ubah dari 80vh menjadi 90vh */
     height: 95vh; 
     display: flex;
     align-items: center;
@@ -68,7 +99,6 @@ body {
     overflow: hidden; 
 }
 
-/* Ketinggian penuh untuk Carousel (Penting) */
 .carousel, .carousel-inner, .carousel-item {
     width: 100%;
     height: 100%;
@@ -82,26 +112,20 @@ body {
 
 .hero-overlay {
     position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    top: 0; right: 0; bottom: 0; left: 0;
     background-color: rgba(51, 51, 51, 0.4); 
     z-index: 1;
 }
 
 .hero-caption-content {
-    /* Gaya ini diubah di media query untuk mobile */
     position: absolute; 
-    top: 55%;
-    left: 50%;
+    top: 55%; left: 50%;
     transform: translate(-50%, -50%);
     width: 90%;
     max-width: 800px;
     z-index: 2;
     padding: 0 15px;
 }
-
 
 /* --- 2. GAYA UNTUK VIDEO LOKAL (Custom Overlay dan Tombol Play) --- */
 
@@ -122,10 +146,7 @@ body {
 
 .video-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.4);
     display: flex;
     justify-content: center;
@@ -135,12 +156,7 @@ body {
     z-index: 10;
 }
 
-.video-overlay.hidden {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.video-overlay.autoplay-active {
+.video-overlay.hidden, .video-overlay.autoplay-active {
     opacity: 0;
     pointer-events: none;
 }
@@ -152,71 +168,62 @@ body {
     text-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
 }
 
-
 /* --- 3. BACKGROUND GIF DAN PARALLAX UNTUK SECTION --- */
 
-/* Memperbaiki masalah z-index dengan memastikan background tidak mengganggu konten */
 #services, #contact {
     position: relative;
-    overflow: hidden; /* Penting untuk mengontrol konten */
+    overflow: hidden; 
 }
 
-/* Padding untuk Services (Tinggi standar) */
 #services {
     padding-top: 3rem !important;
     padding-bottom: 0.5rem !important; 
-    background-image: url('../img/ai_cctv.gif'); /* Ganti dengan URL GIF Anda */
+    background-image: url('../img/ai_cctv.gif'); 
     background-size: cover;
     background-position: center center;
-    background-attachment: fixed; /* Efek Parallax */
+    background-attachment: fixed; 
 }
 
-/* Padding untuk Contact (Dibuat lebih pendek lagi) */
 #contact {
-    padding-top: 3rem !important; /* Mengurangi padding atas */
-    padding-bottom: 2rem !important; /* Mengurangi padding bawah */
-    background-image: url('../img/R.gif'); /* Ganti dengan URL GIF Anda */
+    padding-top: 3rem !important; 
+    padding-bottom: 2rem !important; 
+    background-image: url('../img/R.gif'); 
     background-size: cover;
     background-position: center center;
-    background-attachment: fixed; /* Efek Parallax */
+    background-attachment: fixed; 
     color: #ffffff;
 }
 
 .services-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     background-color: rgba(255, 255, 255, 0.75); 
     z-index: 0;
 }
 
+/* Dark mode khusus untuk parallax agar tidak menyilaukan */
+html[data-theme="dark"] .services-overlay {
+    background-color: rgba(18, 18, 18, 0.85); 
+}
 
 .contact-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     background-color: rgba(0, 0, 0, 0.5); 
     z-index: 0;
 }
 
-/* Memastikan konten di atas overlay */
 #services > .container-md, 
 #contact > .container-md {
     position: relative;
     z-index: 1; 
 }
 
-
 /* --- 4. GAYA INTERAKSI KUSTOM (Hover Effect) --- */
 
 .card-hover-shadow {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
 .card-hover-shadow:hover {
     transform: translateY(-5px);
     box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important; 
@@ -225,220 +232,63 @@ body {
 /* --- 5. GAYA KUSTOM UNTUK TIMELINE (Perjalanan AMANIN) --- */
 
 .timeline-navigation-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    width: 100%;
+    position: relative; display: flex; align-items: center; width: 100%;
 }
-
 .timeline-container {
-    display: flex;
-    overflow-x: auto;
-    padding: 20px 0;
-    gap: 15px;
-    width: 100%;
-    /* PENTING: Matikan smooth scroll CSS agar tidak bentrok dengan JS */
-    scroll-behavior: auto !important; 
-    scrollbar-width: none; /* Sembunyikan scrollbar Firefox */
+    display: flex; overflow-x: auto; padding: 20px 0; gap: 15px; width: 100%;
+    scroll-behavior: auto !important; scrollbar-width: none; 
 }
+.timeline-container::-webkit-scrollbar { display: none; }
+.timeline-item { flex: 0 0 240px; text-align: center; }
+.scroll-sensor { position: absolute; top: 0; bottom: 0; width: 100px; z-index: 10; cursor: pointer; }
 
-.timeline-container::-webkit-scrollbar {
-    display: none; /* Sembunyikan scrollbar Chrome/Safari */
-}
-
-.timeline-item {
-    /* Set lebar fix sekitar 240px agar 4-5 item muat berdampingan di layar */
-    flex: 0 0 240px; 
-    text-align: center;
-}
-
-.scroll-sensor {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 100px; /* Area sensor lebih lebar */
-    z-index: 10;
-    cursor: pointer;
-}
-
-/* Gradien putih agar terlihat ada efek transisi di ujung layar */
+/* Menyesuaikan gradien sensor dengan tema aktif dan MEMPERBAIKI POSISI */
 .left-sensor { 
-    left: 0; 
-    background: linear-gradient(to right, rgba(248,249,250, 1) 0%, transparent 100%);
+    left: 0; /* Mengunci sensor di kiri */
+    background: linear-gradient(to right, var(--bg-light-section) 0%, transparent 100%); 
 }
 .right-sensor { 
-    right: 0; 
-    background: linear-gradient(to left, rgba(248,249,250, 1) 0%, transparent 100%);
+    right: 0; /* Mengunci sensor di kanan */
+    background: linear-gradient(to left, var(--bg-light-section) 0%, transparent 100%); 
 }
 
-/* Garis tengah horizontal (Penghubung) */
-.timeline-spacer {
-    display: flex;
-    align-items: center;
-    flex-grow: 1;
-    padding: 0 10px; 
-}
+.timeline-spacer { display: flex; align-items: center; flex-grow: 1; padding: 0 10px; }
+.timeline-spacer > hr { height: 2px; background-color: var(--text-secondary); margin: 0; width: 100%; }
+.timeline-dot { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: var(--primary); }
 
-.timeline-spacer > hr {
-    height: 2px;
-    background-color: var(--text-secondary); 
-    margin: 0;
-    width: 100%;
-}
+/* --- 6. GAYA KUSTOM UNTUK CHART.JS --- */
 
-/* Titik Timeline (Dot) */
-.timeline-dot {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: var(--primary); 
-}
-
-
-/* --- 6. GAYA KUSTOM UNTUK CHART.JS BARU --- */
-
-/* Wrapper baru untuk membatasi lebar container metrik di desktop */
-.metrics-chart-wrapper {
-    max-width: 900px; /* Batasi lebar maksimum agar tidak terlalu lebar */
-    width: 100%; /* Pastikan responsif */
-    margin: auto; /* Pusatkan di dalam kolom */
-}
-
-.chart-container-group {
-    /* Gaya untuk membungkus kedua chart */
-    border: 1px solid var(--text-secondary); 
-    padding: 1rem !important; /* Kurangi padding internal */
-}
-
-.chart-wrapper {
-    position: relative;
-    padding: 10px; /* Tambahkan padding ekstra pada wrapper */
-}
-
-canvas {
-    max-width: 100% !important;
-}
-
-/* Mengurangi padding untuk h4 di dalam chart-wrapper */
-.chart-container-group .chart-wrapper h4 {
-    margin-bottom: 0.5rem !important; /* Kurangi margin bawah */
-    font-size: 0.9rem !important; /* Sedikit perkecil ukuran font judul chart */
-}
+.metrics-chart-wrapper { max-width: 900px; width: 100%; margin: auto; }
+.chart-container-group { border: 1px solid var(--border-color); padding: 1rem !important; }
+.chart-wrapper { position: relative; padding: 10px; }
+canvas { max-width: 100% !important; }
+.chart-container-group .chart-wrapper h4 { margin-bottom: 0.5rem !important; font-size: 0.9rem !important; }
 
 /* --- 7. GAYA UNTUK SCROLL SLIDESHOW BARU --- */
 
-.story-scroll-container {
-    position: relative;
-    /* Ditetapkan tinggi agar hanya satu slide yang terlihat */
-    min-height: 400px; 
-    margin-top: 3rem;
-    overflow: hidden; /* Penting agar slide tidak tumpang tindih */
-}
+.story-scroll-container { position: relative; min-height: 400px; margin-top: 3rem; overflow: hidden; }
+.story-wrapper { position: relative; min-height: 550px; width: 100%; }
+.scroll-slide { width: 100%; position: absolute; top: 0; left: 0; opacity: 0; visibility: hidden; transition: all 0.6s ease; }
+.scroll-slide.active { position: relative; opacity: 1; visibility: visible; z-index: 2; }
 
-.story-wrapper {
-    position: relative;
-    /* Memberikan tinggi minimal yang pasti agar saat ganti slide, halaman tidak naik/turun */
-    min-height: 550px; 
-    width: 100%;
-}
+.animate-in-left { opacity: 0.1 !important; transform: translateX(-100%); }
+.scroll-slide.active.animate-in-left { transform: translateX(0); opacity: 1 !important; }
+.animate-in-right { opacity: 0.1 !important; transform: translateX(100%); }
+.scroll-slide.active.animate-in-right { transform: translateX(0); opacity: 1 !important; }
+.animate-out { opacity: 0; visibility: hidden; }
 
-/* Memastikan slide tidak merusak layout saat transisi */
-.scroll-slide {
-    width: 100%;
-    position: absolute; /* Bertumpuk di satu tempat */
-    top: 0;
-    left: 0;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.6s ease;
-}
+/* --- 8. GAYA KUSTOM UNTUK NAVIGASI SLIDESHOW --- */
 
-.scroll-slide.active {
-    position: relative; /* Slide yang aktif mengembalikan wujudnya */
-    opacity: 1;
-    visibility: visible;
-    z-index: 2;
-}
+.slide-nav-btn { width: 60px !important; height: 60px !important; border-radius: 50% !important; display: flex !important; justify-content: center !important; align-items: center !important; font-size: 1.2rem; transition: all 0.2s ease; border-width: 2px !important; }
+.slide-nav-btn:hover:not(:disabled) { transform: scale(1.1); }
+.slide-nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.slide-nav-btn i { margin: 0 !important; }
 
-/* --- KEYFRAMES DAN ANIMASI MASUK/KELUAR --- */
-
-/* Animasi Masuk dari Kiri */
-.animate-in-left {
-    opacity: 0.1 !important;
-    transform: translateX(-100%);
-}
-.scroll-slide.active.animate-in-left {
-    transform: translateX(0);
-    opacity: 1 !important;
-}
-
-/* Animasi Masuk dari Kanan */
-.animate-in-right {
-    opacity: 0.1 !important;
-    transform: translateX(100%);
-}
-.scroll-slide.active.animate-in-right {
-    transform: translateX(0);
-    opacity: 1 !important;
-}
-
-/* Animasi Keluar (Hanya Fade Out) */
-.animate-out {
-    opacity: 0;
-    visibility: hidden;
-}
-
-/* --- 8. GAYA KUSTOM UNTUK NAVIGASI SLIDESHOW (Tombol Panah) BARU --- */
-
-.slide-nav-btn {
-    width: 60px !important;
-    height: 60px !important;
-    border-radius: 50% !important; /* Membuat bulat */
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    font-size: 1.2rem;
-    transition: all 0.2s ease;
-    border-width: 2px !important;
-}
-
-.slide-nav-btn:hover:not(:disabled) {
-    transform: scale(1.1);
-}
-
-.slide-nav-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* Penyesuaian agar ikon chevron di tengah */
-.slide-nav-btn i {
-    margin: 0 !important;
-}
-
-/* MEDIA QUERIES (Tetap) */
+/* MEDIA QUERIES */
 @media (max-width: 767.98px) {
-    .timeline-container {
-        /* Memastikan timeline bisa di-scroll horizontal */
-        overflow-x: auto;
-    }
-
-    /* Penyesuaian metrik di mobile */
-    .metrics-chart-wrapper {
-        max-width: none; 
-    }
-    .chart-container-group {
-        padding: 0.75rem !important; 
-    }
-    .chart-container-group .chart-wrapper {
-        height: 180px; 
-    }
-    .chart-container-group .chart-wrapper h4 {
-        font-size: 0.8rem !important; 
-    }
+    .timeline-container { overflow-x: auto; }
+    .metrics-chart-wrapper { max-width: none; }
+    .chart-container-group { padding: 0.75rem !important; }
+    .chart-container-group .chart-wrapper { height: 180px; }
+    .chart-container-group .chart-wrapper h4 { font-size: 0.8rem !important; }
 }

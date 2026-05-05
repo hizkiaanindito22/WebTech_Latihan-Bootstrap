@@ -1,20 +1,6 @@
 <?php 
 include 'koneksi.php';
-
-// Cek apakah ada data yang dikirim melalui POST (Dari Form Kontak)
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_kontak'])) {
-    $nama  = mysqli_real_escape_string($koneksi, $_POST['namaLengkap']);
-    $email = mysqli_real_escape_string($koneksi, $_POST['alamatEmail']);
-    $pesan = mysqli_real_escape_string($koneksi, $_POST['detailPesan']);
-
-    $query = "INSERT INTO pesan_kontak (nama, email, pesan) VALUES ('$nama', '$email', '$pesan')";
-
-    if (mysqli_query($koneksi, $query)) {
-        echo "<script>alert('Pesan berhasil terkirim ke database AMANIN!');</script>";
-    } else {
-        echo "<script>alert('Gagal mengirim pesan: " . mysqli_error($koneksi) . "');</script>";
-    }
-}
+// File sent_message.php akan memproses form karena action pada form mengarah ke sana.
 ?>
 
 <!DOCTYPE html>
@@ -23,129 +9,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_kontak'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webnya-AMANIN</title>
-    <link rel="icon" type="image/png" href="img/processed_image2.png">
+    <!-- Perbaikan Jalur Favicon -->
+    <link rel="icon" type="image/png" href="./img/processed_image2.png">
     
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/customstyle.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
+    <!-- Library SweetAlert2 (Jika dipanggil di halaman ini) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="js/chart.umd.min.js"></script>
     
     <style>
         section {
             scroll-margin-top: 50px; 
         }
-        
-        /* =======================================
-           FIX TINGGI HALAMAN TENTANG KAMI
-           ======================================= */
-        .story-wrapper {
-            position: relative;
-            min-height: 550px; 
-            width: 100%;
-        }
-
-        .scroll-slide {
-            width: 100%;
-            position: absolute; 
-            top: 0;
-            left: 0;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.6s ease;
-        }
-
-        .scroll-slide.active {
-            position: relative; 
-            opacity: 1;
-            visibility: visible;
-            z-index: 2;
-        }
-
-        /* =======================================
-           CSS TIMELINE AMANIN (4/5 ITEM & HOVER)
-           ======================================= */
-        .timeline-navigation-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        .timeline-container {
-            display: flex;
-            align-items: flex-start;
-            overflow-x: auto;
-            padding: 20px 0;
-            width: 100%;
-            scroll-behavior: auto !important; 
-            scrollbar-width: none; 
-        }
-
-        .timeline-container::-webkit-scrollbar {
-            display: none; 
-        }
-
-        .timeline-item {
-            flex: 0 0 22%; 
-            min-width: 220px; 
-            text-align: center;
-            padding: 0 10px;
-            position: relative;
-        }
-
-        .scroll-sensor {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 10%; 
-            z-index: 10;
-            cursor: pointer;
-        }
-
-        .left-sensor { 
-            left: 0; 
-            background: linear-gradient(to right, rgba(248,249,250, 0.9) 0%, transparent 100%);
-        }
-        .right-sensor { 
-            right: 0; 
-            background: linear-gradient(to left, rgba(248,249,250, 0.9) 0%, transparent 100%);
-        }
-
-        /* Garis dan Titik Timeline */
-        .timeline-spacer {
-            position: relative;
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
-        .timeline-spacer hr {
-            border-top: 2px solid #dee2e6;
-            margin: 0;
-        }
-        .timeline-dot {
-            height: 12px;
-            width: 12px;
-            background-color: #4f77ff;
-            border-radius: 50%;
-            display: inline-block;
-            position: absolute;
-            bottom: -5px; /* Menyesuaikan posisi titik di bawah teks */
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        /* Chart Styles */
-        .chart-wrapper {
-            position: relative;
-            padding: 10px;
-        }
     </style>
 </head>
 
 <body>
     
-    <header class="header bg-white shadow-sm sticky-top">
+    <header class="header shadow-sm sticky-top" style="background-color: var(--bg-card);">
         <nav class="navbar navbar-expand-lg navbar-light p-0" id="mainNav">
             <div class="container-md"> 
                 <a class="navbar-brand d-flex align-items-center" href="#home">
@@ -160,7 +44,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_kontak'])) {
                 </button>
                 
                 <div class="collapse navbar-collapse justify-content-end" id="navbarNav"> 
-                    <ul class="navbar-nav text-base font-weight-medium">
+                    <!-- PERBAIKAN: Tombol Dark Mode dimasukkan KE DALAM ul -->
+                    <ul class="navbar-nav text-base font-weight-medium align-items-lg-center">
                         <li class="nav-item">
                             <a class="nav-link text-secondary active smooth-scroll px-3" href="#home">Beranda</a>
                         </li>
@@ -172,6 +57,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_kontak'])) {
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-secondary smooth-scroll px-3" href="#contact">Kontak</a>
+                        </li>
+                        <!-- Tombol Dark Mode Pindah ke Sini -->
+                        <li class="nav-item ml-lg-3 mt-2 mt-lg-0 pb-2 pb-lg-0">
+                            <button id="darkModeToggle" class="btn btn-sm btn-outline-primary rounded-circle d-flex justify-content-center align-items-center" title="Ganti Tema" style="width: 35px; height: 35px;">
+                                <i class="fas fa-moon"></i>
+                            </button>
                         </li>
                     </ul>
                 </div>
@@ -449,7 +340,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_kontak'])) {
             <h2 class="h1 font-weight-bold mb-3 text-white">Kontak Kami</h2>
             <p class="lead font-weight-bold mb-3 text-white">Dapatkan Perlindungan Terbaik!</p>
 
-            <form action="" method="POST" class="bg-white p-4 p-md-5 rounded-lg shadow-lg border border-gray-100"> 
+            <form action="sent_message.php" method="POST" class="bg-white p-4 p-md-5 rounded-lg shadow-lg border border-gray-100"> 
                 <div class="form-row"> 
                     <div class="form-group col-md-6"> 
                         <input type="text" name="namaLengkap" class="form-control rounded" placeholder="Nama Lengkap" required>
@@ -479,13 +370,57 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_kontak'])) {
         </div>
     </footer>
 
-    <script src="js/jquery.slim.min.js"></script>
-    <script src="js/popper.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
+    <!-- PENTING: Urutan script Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
         // ===================================
-        // 1. MENU NAVIGASI AKTIF & SMOOTH SCROLL
+        // 1. LOGIKA DARK MODE AMANIN
+        // ===================================
+        // Dijalankan saat DOM siap agar elemen ditemukan
+        document.addEventListener('DOMContentLoaded', () => {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const htmlElement = document.documentElement; // Target tag <html>
+
+            // Fungsi Ganti Tema
+            function toggleTheme() {
+                const currentTheme = htmlElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                htmlElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('amanin-theme', newTheme);
+                updateToggleIcon(newTheme);
+            }
+
+            // Fungsi Update Ikon
+            function updateToggleIcon(theme) {
+                if (!darkModeToggle) return; 
+                if (theme === 'dark') {
+                    darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                    darkModeToggle.classList.replace('btn-outline-primary', 'btn-outline-warning');
+                } else {
+                    darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                    if (darkModeToggle.classList.contains('btn-outline-warning')) {
+                        darkModeToggle.classList.replace('btn-outline-warning', 'btn-outline-primary');
+                    }
+                }
+            }
+
+            // Pasang Event Listener
+            if (darkModeToggle) {
+                darkModeToggle.addEventListener('click', toggleTheme);
+            }
+
+            // Cek preferensi awal saat web dimuat
+            const savedTheme = localStorage.getItem('amanin-theme') || 'light';
+            htmlElement.setAttribute('data-theme', savedTheme);
+            updateToggleIcon(savedTheme);
+        });
+
+        // ===================================
+        // 2. MENU NAVIGASI AKTIF & SMOOTH SCROLL
         // ===================================
         const sections = document.querySelectorAll("section");
         const navLinks = document.querySelectorAll(".navbar-nav .nav-link");
@@ -519,7 +454,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_kontak'])) {
         });
                 
         // ===================================
-        // 2. LOGIKA VIDEO PROFIL
+        // 3. LOGIKA VIDEO PROFIL
         // ===================================
         const mainVideo = document.getElementById('mainVideo');
         const videoOverlay = document.getElementById('videoOverlay');
@@ -578,7 +513,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_kontak'])) {
         }
 
         // ===================================
-        // 3. LOGIKA SLIDESHOW & TRIGGER ANIMASI
+        // 4. LOGIKA SLIDESHOW & TRIGGER ANIMASI
         // ===================================
         const slides = document.querySelectorAll('.scroll-slide');
         const prevButton = document.getElementById('prevSlide');
@@ -606,7 +541,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_kontak'])) {
                     nextSlide.classList.remove('animate-out');
                     nextSlide.classList.add('active', enterClass);
                     
-                    // --- TRIGGER ANIMASI KETIKA SLIDE 3 (METRIK) TERBUKA ---
                     if (currentSlide === 3) {
                         playChartAnimations();
                     }
@@ -636,7 +570,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_kontak'])) {
         }
 
         // ===================================
-        // 4. MENGEMBALIKAN WHEEL SCROLL CAROUSEL
+        // 5. MENGEMBALIKAN WHEEL SCROLL CAROUSEL
         // ===================================
         const storyScrollContainer = document.querySelector('.story-scroll-container');
         let lastWheelTime = 0;
@@ -662,68 +596,99 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_kontak'])) {
         }
 
         // ===================================
-        // 5. LOGIKA HOVER SCROLL TIMELINE & DEFAULT 2024
+        // LOGIKA HOVER SCROLL TIMELINE AMANIN
         // ===================================
-        const timeline = document.getElementById('timelineAmanin');
-        const leftSensor = document.getElementById('leftSensor');
-        const rightSensor = document.getElementById('rightSensor');
+        document.addEventListener('DOMContentLoaded', () => {
+            const timeline = document.getElementById('timelineAmanin');
+            const leftSensor = document.getElementById('leftSensor');
+            const rightSensor = document.getElementById('rightSensor');
 
-        let scrollInterval;
-        const scrollSpeed = 6; 
+            let isScrolling = false;
+            let scrollDirection = '';
+            const scrollSpeed = 6; // Semakin besar angka, semakin cepat scrollnya
 
-        function startScrolling(direction) {
-            stopScrolling();
-            if (!timeline) return;
-            scrollInterval = setInterval(() => {
-                if (direction === 'left') timeline.scrollLeft -= scrollSpeed;
-                else timeline.scrollLeft += scrollSpeed;
-            }, 15);
-        }
-
-        function stopScrolling() { clearInterval(scrollInterval); }
-
-        if(leftSensor && rightSensor) {
-            leftSensor.addEventListener('mouseenter', () => startScrolling('left'));
-            leftSensor.addEventListener('mouseleave', stopScrolling);
-            rightSensor.addEventListener('mouseenter', () => startScrolling('right'));
-            rightSensor.addEventListener('mouseleave', stopScrolling);
-        }
-
-        function scrollToLatest() {
-            if (timeline) {
-                setTimeout(() => { timeline.scrollLeft = timeline.scrollWidth; }, 100);
+            // Fungsi scroll animasi yang jauh lebih mulus (Smooth 60FPS)
+            function performScroll() {
+                if (!isScrolling || !timeline) return;
+                
+                if (scrollDirection === 'left') {
+                    timeline.scrollLeft -= scrollSpeed;
+                } else if (scrollDirection === 'right') {
+                    timeline.scrollLeft += scrollSpeed;
+                }
+                
+                // Panggil frame berikutnya secara terus menerus selama isScrolling = true
+                requestAnimationFrame(performScroll);
             }
-        }
 
-        const originalUpdateSlides = updateSlides;
-        updateSlides = function(direction) {
-            originalUpdateSlides(direction);
-            if (currentSlide === 1) scrollToLatest();
-        };
+            if (leftSensor && rightSensor && timeline) {
+                // Event untuk Sensor Kiri
+                leftSensor.addEventListener('mouseenter', () => {
+                    isScrolling = true;
+                    scrollDirection = 'left';
+                    requestAnimationFrame(performScroll);
+                });
+                leftSensor.addEventListener('mouseleave', () => {
+                    isScrolling = false;
+                });
+
+                // Event untuk Sensor Kanan
+                rightSensor.addEventListener('mouseenter', () => {
+                    isScrolling = true;
+                    scrollDirection = 'right';
+                    requestAnimationFrame(performScroll);
+                });
+                rightSensor.addEventListener('mouseleave', () => {
+                    isScrolling = false;
+                });
+
+                // (Opsional) Dukungan sentuhan jika dibuka di layar sentuh laptop/tablet
+                leftSensor.addEventListener('touchstart', (e) => { 
+                    e.preventDefault(); 
+                    isScrolling = true; 
+                    scrollDirection = 'left'; 
+                    requestAnimationFrame(performScroll); 
+                }, {passive: false});
+                leftSensor.addEventListener('touchend', () => { isScrolling = false; });
+                
+                rightSensor.addEventListener('touchstart', (e) => { 
+                    e.preventDefault(); 
+                    isScrolling = true; 
+                    scrollDirection = 'right'; 
+                    requestAnimationFrame(performScroll); 
+                }, {passive: false});
+                rightSensor.addEventListener('touchend', () => { isScrolling = false; });
+            }
+
+            // Fungsi untuk memaksa scroll ke ujung kanan (tahun 2024) saat slide dibuka
+            window.scrollToLatest = function() {
+                if (timeline) {
+                    setTimeout(() => { 
+                        timeline.scrollLeft = timeline.scrollWidth; 
+                    }, 100);
+                }
+            };
+        });
 
         // ===================================
-        // 6. INISIALISASI CHART JS & ANIMASI
+        // 7. INISIALISASI CHART JS & ANIMASI
         // ===================================
         let responseChart;
         let satisfactionChart;
         const primaryColor = '#4f77ff'; 
         const secondaryColor = '#6c757d'; 
 
-        // Fungsi Memutar Ulang Animasi
         function playChartAnimations() {
             if (responseChart && satisfactionChart) {
-                // 1. Simpan nilai aktual yang didapat dari database
                 const targetWaktu = responseChart.data.datasets[1].data[0] || 0;
                 const targetPuas = satisfactionChart.data.datasets[0].data[0] || 0;
                 const targetTidakPuas = satisfactionChart.data.datasets[0].data[1] || 100;
 
-                // 2. Setel nilai grafik menjadi 0 (Tanpa animasi)
                 responseChart.data.datasets[1].data = [0];
                 satisfactionChart.data.datasets[0].data = [0, 100];
                 responseChart.update('none');
                 satisfactionChart.update('none');
 
-                // 3. Beri jeda 100ms, lalu kembalikan ke nilai aktual (Akan memicu animasi)
                 setTimeout(() => {
                     responseChart.data.datasets[1].data = [targetWaktu];
                     satisfactionChart.data.datasets[0].data = [targetPuas, targetTidakPuas];
@@ -762,10 +727,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_kontak'])) {
                         ]
                     },
                     options: {
-                        animation: {
-                            duration: 1500, // Durasi animasi 1.5 Detik
-                            easing: 'easeOutQuart' // Animasi melambat di akhir
-                        },
+                        animation: { duration: 1500, easing: 'easeOutQuart' },
                         indexAxis: 'y', 
                         grouped: false, 
                         responsive: true,
@@ -802,10 +764,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_kontak'])) {
                         }]
                     },
                     options: {
-                        animation: {
-                            duration: 1500, // Durasi animasi lingkaran 1.5 Detik
-                            easing: 'easeOutQuart' 
-                        },
+                        animation: { duration: 1500, easing: 'easeOutQuart' },
                         responsive: true,
                         maintainAspectRatio: false,
                         cutout: '75%', 
@@ -846,7 +805,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_kontak'])) {
                 });
             }
 
-            // Fungsi AJAX Real-Time dengan Deteksi Perubahan Data
             function updateMetricsRealtime() {
                 fetch('get_metrics.php?t=' + new Date().getTime())
                     .then(response => {
@@ -854,37 +812,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_kontak'])) {
                         return response.json();
                     })
                     .then(data => {
-                        // 1. Logika Update Bar Chart (Waktu Respons)
                         if (responseChart) {
-                            // Ambil angka yang sedang tampil di grafik saat ini
                             let currentWaktu = responseChart.data.datasets[1].data[0];
-                            
-                            // Jika angka dari database BERBEDA dengan yang di grafik, maka animasikan!
                             if (currentWaktu !== data.waktu_amanin) {
                                 responseChart.data.datasets[1].data = [data.waktu_amanin];
                                 responseChart.data.datasets[1].label = `Respon AMANIN (${data.waktu_amanin} Menit)`;
-                                responseChart.update(); // <-- Memanggil .update() tanpa 'none' memicu animasi transisi mulus
+                                responseChart.update(); 
                             }
                         }
 
-                        // 2. Logika Update Doughnut Chart (Kepuasan)
                         if (satisfactionChart) {
-                            // Ambil persentase Puas yang sedang tampil saat ini
                             let currentPuas = satisfactionChart.data.datasets[0].data[0];
-                            
-                            // Jika persentase berubah, putar grafiknya!
                             if (currentPuas !== data.puas) {
                                 satisfactionChart.data.datasets[0].data = [data.puas, data.tidak_puas];
                                 satisfactionChart.data.labels = [`Puas (${data.puas}%)`, `Tidak Puas (${data.tidak_puas}%)`];
-                                satisfactionChart.update(); // <-- Memicu animasi memutar
+                                satisfactionChart.update(); 
                             }
                         }
                     })
                     .catch(error => console.error('Gagal memuat data metrik:', error));
             }
 
-            updateMetricsRealtime(); // Panggil pertama kali
-            setInterval(updateMetricsRealtime, 3000); // Polling setiap 3 detik
+            updateMetricsRealtime(); 
+            setInterval(updateMetricsRealtime, 3000); 
         });
     </script>
 </body>
