@@ -1,5 +1,24 @@
 <?php 
 include 'koneksi.php';
+
+// Tangkap ID Berita dari URL
+$id_berita = isset($_GET['id']) ? intval($_GET['id']) : 0;
+
+// Ambil data berita dari database
+$query = "SELECT * FROM berita WHERE id = $id_berita";
+$result = mysqli_query($koneksi, $query);
+
+// Jika berita tidak ditemukan (misal user mengubah URL sembarangan)
+if (!$result || mysqli_num_rows($result) == 0) {
+    echo "<script>alert('Berita tidak ditemukan!'); window.location.href='berita.php';</script>";
+    exit;
+}
+
+$row = mysqli_fetch_assoc($result);
+
+// Setel Gambar
+$gambar_berita = !empty($row['gambar']) ? 'img/' . $row['gambar'] : 'https://placehold.co/1200x600/e9ecef/4f77ff?text=Berita+Amanin';
+$tanggal = date('d M Y', strtotime($row['tanggal_publikasi']));
 ?>
 
 <!DOCTYPE html>
@@ -7,7 +26,7 @@ include 'koneksi.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Berita - AMANIN</title>
+    <title><?php echo htmlspecialchars($row['judul_berita']); ?> - AMANIN</title>
     <!-- Ikon sesuai permintaan Anda -->
     <link rel="icon" type="image/png" href="./img/processed_image2.png">
     
@@ -16,23 +35,38 @@ include 'koneksi.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        .news-header {
-            padding: 80px 0 40px 0;
-            background: linear-gradient(to right, var(--primary), #2a4db3);
-        }
-
         /* =======================================
            ANIMASI SMOOTH PAGE OPEN
            ======================================= */
         .page-enter-animation {
-            animation: smoothPageOpen 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            animation: smoothDetailOpen 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
             opacity: 0;
-            transform: translateY(30px) scale(0.98);
+            transform: translateY(40px) scale(0.97);
         }
         
-        @keyframes smoothPageOpen {
-            0% { opacity: 0; transform: translateY(30px) scale(0.98); }
+        @keyframes smoothDetailOpen {
+            0% { opacity: 0; transform: translateY(40px) scale(0.97); }
             100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Desain Khusus Halaman Detail */
+        .article-cover {
+            width: 100%;
+            height: 450px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .article-body {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: var(--text-muted);
+            margin-top: 30px;
+        }
+
+        .article-body p {
+            margin-bottom: 1.5rem;
         }
     </style>
 </head>
@@ -73,60 +107,47 @@ include 'koneksi.php';
         </nav>
     </header>
 
-    <!-- WRAPPER ANIMASI -->
+    <!-- WRAPPER ANIMASI UNTUK KONTEN -->
     <div class="page-enter-animation">
-        <!-- Header Berita -->
-        <section class="news-header text-center">
-            <div class="container-md">
-                <h1 class="display-4 font-weight-bold text-white mb-3">Berita & Informasi</h1>
-                <p class="lead text-white opacity-75">Update terbaru, tips keamanan, dan kegiatan operasional kami di lapangan.</p>
-            </div>
-        </section>
-
-        <!-- Grid Card Berita -->
+        
         <section class="py-5 bg-light min-vh-100">
-            <div class="container-md">
-                <div class="row">
-                    
-                    <?php
-                    $query_berita = "SELECT * FROM berita ORDER BY tanggal_publikasi DESC";
-                    $result_berita = mysqli_query($koneksi, $query_berita);
+            <div class="container-md" style="max-width: 900px;">
+                
+                <!-- Tombol Kembali -->
+                <a href="berita.php" class="btn btn-outline-secondary btn-sm rounded-pill mb-4 font-weight-bold">
+                    <i class="fas fa-arrow-left mr-2"></i>Kembali ke Daftar Berita
+                </a>
 
-                    if ($result_berita && mysqli_num_rows($result_berita) > 0) {
-                        while($row = mysqli_fetch_assoc($result_berita)) {
-                            
-                            $gambar_berita = !empty($row['gambar']) ? 'img/' . $row['gambar'] : 'https://placehold.co/600x400/e9ecef/4f77ff?text=Berita+Amanin';
-                            $ringkasan = substr(strip_tags($row['konten']), 0, 100) . '...';
-                            $tanggal = date('d M Y', strtotime($row['tanggal_publikasi']));
-                            ?>
-                            
-                            <div class="col-md-4 mb-4">
-                                <div class="card h-100 border-0 shadow-sm card-hover-shadow rounded-lg">
-                                    <img src="<?php echo $gambar_berita; ?>" class="card-img-top" alt="Gambar Berita" style="height: 200px; object-fit: cover; border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem;">
-                                    <div class="card-body">
-                                        <p class="text-secondary small font-weight-bold mb-2"><i class="fas fa-calendar-alt mr-1"></i> <?php echo $tanggal; ?></p>
-                                        <h5 class="card-title font-weight-bold text-dark"><?php echo htmlspecialchars($row['judul_berita']); ?></h5>
-                                        <p class="card-text text-secondary"><?php echo $ringkasan; ?></p>
-                                    </div>
-                                    <div class="card-footer bg-transparent border-0 pt-0 pb-4">
-                                        <!-- PERBAIKAN: Link mengarah ke detail_berita.php membawa ID berita -->
-                                        <a href="detail_berita.php?id=<?php echo $row['id']; ?>" class="btn btn-sm btn-outline-primary rounded-pill px-4 font-weight-bold">Baca Selengkapnya</a>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <?php
-                        }
-                    } else {
-                        echo "<div class='col-12 text-center my-5'>
-                                <i class='fas fa-newspaper fa-4x text-secondary mb-3' style='opacity: 0.5;'></i>
-                                <h4 class='text-dark'>Belum ada berita.</h4>
-                                <p class='text-secondary'>Nantikan update terbaru dari kami segera!</p>
-                              </div>";
-                    }
+                <!-- Judul Artikel -->
+                <h1 class="display-5 font-weight-bold text-dark mb-3">
+                    <?php echo htmlspecialchars($row['judul_berita']); ?>
+                </h1>
+                
+                <!-- Tanggal -->
+                <p class="text-primary font-weight-bold mb-4">
+                    <i class="fas fa-calendar-alt mr-2"></i>Dipublikasikan pada: <?php echo $tanggal; ?>
+                </p>
+
+                <!-- Gambar Artikel -->
+                <img src="<?php echo $gambar_berita; ?>" alt="Cover Berita" class="article-cover mb-5">
+
+                <!-- Full Text Konten Artikel -->
+                <div class="article-body bg-white p-4 p-md-5 rounded-lg shadow-sm border border-gray-100">
+                    <?php 
+                        // nl2br berguna jika teks di database menggunakan Enter/Baris Baru biasa
+                        // Jika Anda menyimpan HTML dari Text Editor (seperti TinyMCE), hapus nl2br()
+                        echo nl2br(htmlspecialchars($row['konten'])); 
                     ?>
-
                 </div>
+
+                <hr class="my-5">
+                <div class="text-center">
+                    <p class="text-secondary small font-weight-bold">Bagikan artikel ini:</p>
+                    <button class="btn btn-primary btn-sm rounded-circle mx-1" style="width: 35px; height: 35px;"><i class="fab fa-whatsapp"></i></button>
+                    <button class="btn btn-info btn-sm rounded-circle mx-1" style="width: 35px; height: 35px;"><i class="fab fa-twitter"></i></button>
+                    <button class="btn btn-primary btn-sm rounded-circle mx-1" style="width: 35px; height: 35px;"><i class="fab fa-facebook-f"></i></button>
+                </div>
+
             </div>
         </section>
 
@@ -135,6 +156,7 @@ include 'koneksi.php';
                 <p class="text-muted small text-center mb-0">&copy; 2026 PT Selalu Dibuat Aman.</p>
             </div>
         </footer>
+        
     </div> <!-- END WRAPPER ANIMASI -->
 
     <!-- Script -->

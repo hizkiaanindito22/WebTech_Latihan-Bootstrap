@@ -1,6 +1,24 @@
 <?php 
 include 'koneksi.php';
-// File sent_message.php akan memproses form karena action pada form mengarah ke sana.
+
+// Cek apakah ada data yang dikirim melalui POST (Dari Form Kontak)
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_kontak'])) {
+    $nama  = mysqli_real_escape_string($koneksi, $_POST['namaLengkap']);
+    $email = mysqli_real_escape_string($koneksi, $_POST['alamatEmail']);
+    $pesan = mysqli_real_escape_string($koneksi, $_POST['detailPesan']);
+
+    $query = "INSERT INTO pesan_kontak (nama, email, pesan) VALUES ('$nama', '$email', '$pesan')";
+
+    if (mysqli_query($koneksi, $query)) {
+        echo "<script>alert('Pesan berhasil terkirim ke database AMANIN!');</script>";
+    } else {
+        echo "<script>alert('Gagal mengirim pesan: " . mysqli_error($koneksi) . "');</script>";
+    }
+}
+?>
+
+<?php 
+include 'sent_message.php'; // Atau gunakan require 'sent_message.php';
 ?>
 
 <!DOCTYPE html>
@@ -9,7 +27,7 @@ include 'koneksi.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webnya-AMANIN</title>
-    <!-- Perbaikan Jalur Favicon -->
+    <!-- Perbaikan Jalur Favicon (Tetap Sesuai Permintaan Anda) -->
     <link rel="icon" type="image/png" href="./img/processed_image2.png">
     
     <link rel="stylesheet" href="css/bootstrap.min.css">
@@ -23,6 +41,66 @@ include 'koneksi.php';
     <style>
         section {
             scroll-margin-top: 50px; 
+        }
+
+        /* =======================================
+           CSS ANIMASI POP-UP BERITA & TRIGGER
+           ======================================= */
+        .news-popup {
+            position: fixed;
+            bottom: 30px;
+            right: -400px; /* Sembunyi di luar layar kanan */
+            width: 320px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            z-index: 1050;
+            transition: right 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .news-popup.show-popup {
+            right: 20px; /* Meluncur masuk */
+        }
+        .news-popup .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.6);
+            border: none;
+            font-size: 1.2rem;
+            color: #ffffff;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            z-index: 2;
+        }
+        .news-popup .close-btn:hover {
+            background: rgba(0,0,0,0.9);
+        }
+
+        /* Balon Bar Menempel di Kanan */
+        .news-trigger {
+            position: fixed;
+            bottom: 40px;
+            right: -150px; /* Tersembunyi default */
+            background-color: var(--primary);
+            border-radius: 20px 0 0 20px; /* Melengkung kiri, rata kanan */
+            padding: 10px 15px 10px 20px;
+            cursor: pointer;
+            z-index: 1049;
+            transition: right 0.4s ease, padding 0.2s;
+            box-shadow: -2px 5px 15px rgba(0,0,0,0.2);
+        }
+        .news-trigger.show-trigger {
+            right: 0; /* Menempel di kanan */
+        }
+        .news-trigger:hover {
+            background-color: #3b5bdb;
+            padding-right: 25px; /* Efek memanjang saat di-hover */
         }
     </style>
 </head>
@@ -58,6 +136,12 @@ include 'koneksi.php';
                         <li class="nav-item">
                             <a class="nav-link text-secondary smooth-scroll px-3" href="#contact">Kontak</a>
                         </li>
+                        
+                        <!-- Menu Berita -->
+                        <li class="nav-item">
+                            <a class="nav-link text-secondary px-3" href="berita.php">Berita</a>
+                        </li>
+
                         <!-- Tombol Dark Mode Pindah ke Sini -->
                         <li class="nav-item ml-lg-3 mt-2 mt-lg-0 pb-2 pb-lg-0">
                             <button id="darkModeToggle" class="btn btn-sm btn-outline-primary rounded-circle d-flex justify-content-center align-items-center" title="Ganti Tema" style="width: 35px; height: 35px;">
@@ -370,12 +454,89 @@ include 'koneksi.php';
         </div>
     </footer>
 
+    <!-- ===================================
+         ELEMEN POP-UP BERITA (Dengan Gambar)
+         =================================== -->
+    <div id="newsPopup" class="news-popup shadow-lg rounded">
+        <div class="position-relative">
+            <!-- Gambar Pop-Up -->
+            <img src="img/perumahan.png" alt="Berita AMANIN" class="w-100 rounded-top" style="height: 130px; object-fit: cover;">
+            <!-- Tombol Silang (Close) -->
+            <button id="closeNews" class="close-btn" title="Tutup">&times;</button>
+        </div>
+        <div class="p-3">
+            <h5 class="font-weight-bold text-primary mb-2"><i class="fas fa-newspaper"></i> Berita Terbaru!</h5>
+            <p class="text-secondary small mb-3">Cek update keamanan dan kegiatan operasional dari tim AMANIN di lapangan.</p>
+            <a href="berita.php" class="btn btn-sm btn-primary btn-block rounded-pill font-weight-bold">Baca Selengkapnya</a>
+        </div>
+    </div>
+
+    <!-- ===================================
+         ELEMEN BALON/BAR KANAN (Saat Pop-up disembunyikan)
+         =================================== -->
+    <div id="newsTrigger" class="news-trigger d-flex align-items-center" title="Buka Berita">
+        <i class="fas fa-bell text-white"></i>
+        <span class="text-white small font-weight-bold ml-2">Berita</span>
+    </div>
+
     <!-- PENTING: Urutan script Bootstrap -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
+        // ===================================
+        // 0. LOGIKA POP-UP BERITA & TRIGGER BAR
+        // ===================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const newsPopup = document.getElementById('newsPopup');
+            const closeNews = document.getElementById('closeNews');
+            const newsTrigger = document.getElementById('newsTrigger');
+            
+            // Cek di storage apakah user sebelumnya sudah menekan "Tutup"
+            const isPopupHidden = localStorage.getItem('hideNewsPopup');
+
+            if (isPopupHidden === 'true') {
+                // Jika sudah ditutup sebelumnya, langsung munculkan balon kecil di kanan
+                if (newsTrigger) {
+                    newsTrigger.classList.add('show-trigger');
+                }
+            } else {
+                // Jika belum, luncurkan Pop-up setelah 4 detik
+                if (newsPopup) {
+                    setTimeout(() => {
+                        newsPopup.classList.add('show-popup');
+                    }, 4000); 
+                }
+            }
+
+            // Aksi saat tombol SILANG (Tutup) diklik
+            if (closeNews) {
+                closeNews.addEventListener('click', () => {
+                    newsPopup.classList.remove('show-popup'); // Tarik pop-up keluar layar
+                    localStorage.setItem('hideNewsPopup', 'true'); // Ingat pilihan user
+                    
+                    // Setelah pop-up hilang, munculkan balon/bar di kanan
+                    setTimeout(() => {
+                        if (newsTrigger) newsTrigger.classList.add('show-trigger');
+                    }, 600); // Jeda waktu 0.6 detik
+                });
+            }
+
+            // Aksi saat BALON KANAN diklik
+            if (newsTrigger) {
+                newsTrigger.addEventListener('click', () => {
+                    newsTrigger.classList.remove('show-trigger'); // Tarik balon masuk
+                    localStorage.setItem('hideNewsPopup', 'false'); // Reset memori
+                    
+                    // Setelah balon menghilang, luncurkan kembali pop-up gambar
+                    setTimeout(() => {
+                        if (newsPopup) newsPopup.classList.add('show-popup');
+                    }, 400); 
+                });
+            }
+        });
+
         // ===================================
         // 1. LOGIKA DARK MODE AMANIN
         // ===================================
